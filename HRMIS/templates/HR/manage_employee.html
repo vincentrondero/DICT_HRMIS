@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-md bg-white shadow-custom rounded-xl m-2">
+    <div class="flex items-center justify-center">
+        <button class="bg-white rounded-md cursor-pointer">
+            <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M116.25 66.4583H103.333C101.504 66.4583 99.9709 65.8783 98.7352 64.7183C97.4995 63.5583 96.8795 62.1244 96.8752 60.4167C96.8752 58.7048 97.4952 57.271 98.7352 56.115C99.9752 54.959 101.508 54.379 103.333 54.375H116.25V42.2917C116.25 40.5799 116.87 39.146 118.11 37.99C119.35 36.834 120.883 36.254 122.708 36.25C124.538 36.25 126.073 36.83 127.313 37.99C128.553 39.15 129.171 40.5839 129.167 42.2917V54.375H142.083C143.913 54.375 145.448 54.955 146.688 56.115C147.928 57.275 148.546 58.7089 148.542 60.4167C148.542 62.1285 147.922 63.5644 146.682 64.7244C145.442 65.8844 143.909 66.4623 142.083 66.4583H129.167V78.5417C129.167 80.2535 128.547 81.6894 127.307 82.8494C126.067 84.0094 124.534 84.5873 122.708 84.5833C120.879 84.5833 119.346 84.0033 118.11 82.8433C116.874 81.6833 116.254 80.2494 116.25 78.5417V66.4583ZM58.1252 72.5C51.021 72.5 44.9394 70.1337 39.8804 65.401C34.8213 60.6684 32.2918 54.9792 32.2918 48.3333C32.2918 41.6875 34.8213 35.9983 39.8804 31.2656C44.9394 26.533 51.021 24.1667 58.1252 24.1667C65.2293 24.1667 71.3109 26.533 76.37 31.2656C81.429 35.9983 83.9585 41.6875 83.9585 48.3333C83.9585 54.9792 81.429 60.6684 76.37 65.401C71.3109 70.1337 65.2293 72.5 58.1252 72.5ZM6.4585 108.75V103.917C6.4585 100.493 7.40141 97.3473 9.28725 94.4796C11.1731 91.6118 13.6746 89.4207 16.7918 87.9062C23.4654 84.7847 30.2467 82.4446 37.1356 80.8858C44.0245 79.3271 51.021 78.5457 58.1252 78.5417C65.2293 78.5417 72.2259 79.323 79.1147 80.8858C86.0036 82.4486 92.7849 84.7887 99.4585 87.9062C102.58 89.4167 105.084 91.6078 106.97 94.4796C108.855 97.3514 109.796 100.497 109.792 103.917V108.75C109.792 112.073 108.528 114.919 106.001 117.287C103.473 119.655 100.432 120.837 96.8752 120.833H19.3752C15.8231 120.833 12.7834 119.651 10.256 117.287C7.72864 114.923 6.4628 112.077 6.4585 108.75ZM19.3752 108.75H96.8752V103.917C96.8752 102.809 96.5802 101.802 95.9904 100.896C95.4005 99.9896 94.6191 99.2847 93.646 98.7812C87.8335 96.0625 81.9672 94.0244 76.047 92.6671C70.1269 91.3097 64.1529 90.629 58.1252 90.625C52.0974 90.625 46.1234 91.3057 40.2033 92.6671C34.2831 94.0285 28.4168 96.0665 22.6043 98.7812C21.6356 99.2847 20.8541 99.9896 20.26 100.896C19.6658 101.802 19.3709 102.809 19.3752 103.917V108.75ZM58.1252 60.4167C61.6772 60.4167 64.7191 59.2345 67.2508 56.8702C69.7825 54.5059 71.0461 51.6603 71.0418 48.3333C71.0418 45.0104 69.7782 42.1668 67.2508 39.8025C64.7234 37.4382 61.6816 36.254 58.1252 36.25C54.5731 36.25 51.5334 37.4342 49.006 39.8025C46.4786 42.1708 45.2128 45.0144 45.2085 48.3333C45.2085 51.6562 46.4743 54.5019 49.006 56.8702C51.5377 59.2385 54.5774 60.4207 58.1252 60.4167Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+            </svg> 
+        </button>
+    </div>
+    <h2 class="text-xl font-semibold text-gray-800 flex justify-center pb-3">New Employee</h2>
+</div>
+<button id="activeButton" class="bg-custom-blue text-white rounded-t-xl cursor-pointer ml-10 pr-10 pl-10" onclick="showTable('activeTable')">
+    Active
+ </button>
+ <button id="archiveButton" class="bg-custom-bg rounded-t-xl cursor-pointer ml-1 pr-10 pl-10" onclick="showTable('archiveTable')">
+     Archive
+ </button>
+<div  id="activeTable" class="table-container">
+    <table class="shadow-custom" style="margin-left: 1%; width: 98%;">
+        <thead class="bg-custom-blue text-white" >
+            <tr>
+                <th>Name</th>
+                <th>Employee ID</th>
+                <th>Role</th>
+                <th>Salary Grade</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white">
+            {% for user in users %}
+            <tr>
+                <td  class="text-center align-middle" style="padding-top: 20px;">{{ user.name }}</td>
+                <td  class="text-center align-middle" style="padding-top: 20px;">{{ user.username }}</td>
+                <td  class="text-center align-middle "style="padding-top: 20px;">{{ user.role }}</td>
+                <td  class="text-center align-middle "style="padding-top: 20px;">{{ user.salary_grade }}</td>
+                <td class="text-center align-middle" style="padding-top: 20px;">              
+                    <button class="bg-custom-button1 text-white text-xs p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg" viewBox="0 0 24 24">
+                            <path d="M7 17.013L11.413 16.998L21.045 7.45799C21.423 7.07999 21.631 6.57799 21.631 6.04399C21.631 5.50999 21.423 5.00799 21.045 4.62999L19.459 3.04399C18.703 2.28799 17.384 2.29199 16.634 3.04099L7 12.583V17.013ZM18.045 4.45799L19.634 6.04099L18.037 7.62299L16.451 6.03799L18.045 4.45799ZM9 13.417L15.03 7.44399L16.616 9.02999L10.587 15.001L9 15.006V13.417Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                            <path d="M5 21H19C20.103 21 21 20.103 21 19V10.332L19 12.332V19H8.158C8.132 19 8.105 19.01 8.079 19.01C8.046 19.01 8.013 19.001 7.979 19H5V5H11.847L13.847 3H5C3.897 3 3 3.897 3 5V19C3 20.103 3.897 21 5 21Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                        </svg>
+                    </button>
+                    <button class="bg-custom-button2 p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"  viewBox="0 0 24 24"  class="text-lg" fill="none" viewBox="0 0 24 24">
+                            <path d="M21 3H3C2.44772 3 2 3.44772 2 4V7C2 7.55228 2.44772 8 3 8H21C21.5523 8 22 7.55228 22 7V4C22 3.44772 21.5523 3 21 3Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4 8V19C4 19.5304 4.21071 20.0391 4.58579 20.4142C4.96086 20.7893 5.46957 21 6 21H18C18.5304 21 19.0391 20.7893 19.4142 20.4142C19.7893 20.0391 20 19.5304 20 19V8M9.5 17L14.5 12M9.5 12L14.5 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>   
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="archiveTable" class="hidden table-container">
+    <!-- Archive table content -->
+    <table class="shadow-custom" style="margin-left: 1%; width: 98%;">
+        <!-- Table headers and rows for Archive -->
+        <!-- ... (your archive table content) ... -->
+    </table>
+</div>
+
+
+{% endblock content %}

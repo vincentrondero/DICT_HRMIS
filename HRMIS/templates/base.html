@@ -1,0 +1,33 @@
+{% load static %}
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>DICT HRMIS
+    {% block title %}
+    {% endblock %}
+  </title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.15/tailwind.min.css'>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/payroll.css' %}">
+  <link rel="icon" href="{% static 'favicon.ico' %}">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<body class="relative  bg-custom-main-bg overflow-hidden max-h-screen">
+  {% if user_role == 'HR' %}
+  {% include "partials/HR_sidebar.html" %}
+  {% endif %}
+
+
+<main class="{% if user_role != 'JO' %}ml-60{% endif %} pt-2 max-h-screen overflow-auto">
+    {% block content %}
+    {% endblock%}
+  </main>
+</body>
+<script src ={% static "js/main.js" %}> </script>
+<script src ={% static "js/manage_employee.js" %}> </script>
+</body>
+</html>
