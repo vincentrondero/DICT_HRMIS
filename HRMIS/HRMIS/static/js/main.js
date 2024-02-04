@@ -1,9 +1,15 @@
 console.log ("1111", 1111);
 
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
 function openLogoutModal() {
     var logoutModal = document.getElementById('logoutModal');
     logoutModal.style.display = 'block';
-}
+} 
 
 document.addEventListener('DOMContentLoaded', function () {
   var logoutModal = document.getElementById('logoutModal');
