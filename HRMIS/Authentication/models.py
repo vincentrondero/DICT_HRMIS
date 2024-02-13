@@ -29,3 +29,7 @@ class User(models.Model):
 
     def __str__(self):
         return self.username
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_picture = models.BinaryField(null=True, blank=True)

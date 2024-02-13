@@ -100,6 +100,60 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+//Open Unarchive Modal
+function openUnarchiveModal(userId) {
+    var unarchiveModal = document.getElementById('unarchiveModal');
+    if (unarchiveModal) {
+        unarchiveModal.style.display = 'block';
+
+        var confirmUnarchiveButton = document.getElementById('confirmUnarchive');
+        if (confirmUnarchiveButton) {
+           
+            confirmUnarchiveButton.setAttribute('data-user-id', userId);
+            confirmUnarchiveButton.onclick = function () {
+
+                unarchiveUser(userId);
+            };
+        }
+
+        var overlay = document.getElementById('unarchiveModalOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', closeUnarchiveModal);
+        }
+    }
+}
+//Close Unarchive Modal
+function closeUnarchiveModal() {
+    var unarchiveModal = document.getElementById('unarchiveModal');
+    if (unarchiveModal) {
+        unarchiveModal.style.display = 'none';
+        var overlay = document.getElementById('unarchiveModalOverlay');
+        if (overlay) {
+            overlay.removeEventListener('click', closeUnarchiveModal);
+        }
+    }
+}
+//Unarchive 
+function unarchiveUser(userId) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/hr_views/unarchive_user/' + userId + '/');
+    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+
+    var csrftoken = getCookie('csrftoken');
+    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            closeUnarchiveModal();
+            location.reload();
+        } else {
+            console.error('Error unarchiving user:', xhr.statusText);
+        }
+    };
+
+    xhr.send(JSON.stringify({ unarchive: true }));
+}
+
 // EDIT MODAL JS
 var currentUserId;
 // OPEN EDIT MODAL

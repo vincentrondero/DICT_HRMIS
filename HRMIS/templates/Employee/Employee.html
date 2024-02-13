@@ -1,13 +1,29 @@
 {% extends "base.html" %}
 {% load static %}
+{% block main_js %}<script src ={% static "js/employee.js" %}> </script>{% endblock main_js %}
 {% block  content%}
-<div class="flex-1 bg-custom-blue shadow-custom rounded-md m-auto md:w-3/4">
-    <div class="h-40 w-40 overflow-hidden sm:rounded-full sm:relative sm:p-0 top-20 left-5 border-8 border-white">
-        <img src="https://media.licdn.com/dms/image/C4D03AQH8qidO0nb_Ng/profile-displayphoto-shrink_800_800/0/1615696897070?e=2147483647&v=beta&t=ia3wfE2J7kVLdBy9ttkgUDAA_ul29fymykhQo0lABDo"/>
-    </div>
+
+
+<div class="flex-1 bg-blue-500 shadow-custom rounded-md m-auto md:w-3/4">
+    <div class="h-40 w-40 overflow-hidden sm:rounded-full sm:relative sm:p-0 top-20 left-5 border-8 border-white bg-white">
+        {% if user_profile.profile_picture %}
+            <img src="data:image/png;base64,{{ user_profile.profile_picture }}" alt="User Image">
+        {% else %}
+            <img src="{% static 'images/DICT Logo.png' %}" alt="Image Description">
+        {% endif %}
+    </div>    
+       
     <div class="flex-1 bg-white shadow-custom rounded-bl-md rounded-br-md px-3 pb-10 pt-2 flex flex-col">
         <div class="flex items-center"> 
             <h2 class="text-xl font-semibold text-gray-800 ml-44 border-b border-black">{{ user_name }}</h2>
+            <div class=""> 
+                <button id="open-modal-btn" class="bg-white rounded-xl mx-4 md:w-1/3 transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" fill="currentColor" class="text-lg" viewBox="0 0 24 24">
+                        <path d="M7 17.013L11.413 16.998L21.045 7.45799C21.423 7.07999 21.631 6.57799 21.631 6.04399C21.631 5.50999 21.423 5.00799 21.045 4.62999L19.459 3.04399C18.703 2.28799 17.384 2.29199 16.634 3.04099L7 12.583V17.013ZM18.045 4.45799L19.634 6.04099L18.037 7.62299L16.451 6.03799L18.045 4.45799ZM9 13.417L15.03 7.44399L16.616 9.02999L10.587 15.001L9 15.006V13.417Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                        <path d="M5 21H19C20.103 21 21 20.103 21 19V10.332L19 12.332V19H8.158C8.132 19 8.105 19.01 8.079 19.01C8.046 19.01 8.013 19.001 7.979 19H5V5H11.847L13.847 3H5C3.897 3 3 3.897 3 5V19C3 20.103 3.897 21 5 21Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                    </svg>
+                </button>
+            </div>
             <div class="ml-auto"> 
                 <button id="logoutButton" data-logout-url="{% url 'login_user' %}" type="button" class="inline-flex items-center justify-center h-7 px-4 rounded-xl bg-gray-900 text-gray-300 hover:text-white text-sm font-semibold transition">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="" viewBox="0 0 16 16">
@@ -67,9 +83,23 @@
     </div>
 </div>
 
-
-
-
+<div id="profile-picture-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
+    <div class="bg-white p-4 mx-auto rounded-md w-96 max-h-96">
+        <label for="file-upload" class="max-w-md bg-white shadow-custom rounded-md m-2 cursor-pointer">
+            <div class="flex items-center justify-center border-4 border-dashed rounded-xl">
+                <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M77.75 92.1875H23.4375C20.875 92.1875 18.75 90.0625 18.75 87.5C18.75 84.9375 20.875 82.8125 23.4375 82.8125H77.75L67 72.0625C65.1875 70.25 65.1875 67.25 67 65.4375C68.8125 63.625 71.8125 63.625 73.625 65.4375L92.375 84.1875C92.8125 84.625 93.125 85.125 93.375 85.6875C93.875 86.8125 93.875 88.125 93.375 89.25C93.125 89.8125 92.8125 90.3125 92.375 90.75L73.625 109.5C72.6875 110.438 71.5 110.875 70.3125 110.875C69.125 110.875 67.9375 110.438 67 109.5C66.1283 108.618 65.6394 107.428 65.6394 106.188C65.6394 104.947 66.1283 103.757 67 102.875L77.75 92.125V92.1875ZM131.25 59.375V112.5C131.25 122 123.562 129.688 114.062 129.688H67.1875C57.6875 129.688 50 122 50 112.5V106.25C50 103.688 52.125 101.562 54.6875 101.562C57.25 101.562 59.375 103.688 59.375 106.25V112.5C59.375 116.812 62.875 120.312 67.1875 120.312H114.062C118.375 120.312 121.875 116.812 121.875 112.5V64.0625H92.1875C89.625 64.0625 87.5 61.9375 87.5 59.375V29.6875H67.1875C62.875 29.6875 59.375 33.1875 59.375 37.5V68.75C59.375 71.3125 57.25 73.4375 54.6875 73.4375C52.125 73.4375 50 71.3125 50 68.75V37.5C50 28 57.6875 20.3125 67.1875 20.3125H92.1875C93.4375 20.3125 94.625 20.8125 95.5 21.6875L129.875 56.0625C130.75 56.9375 131.25 58.125 131.25 59.375ZM96.875 54.6875H115.25L96.875 36.3125V54.6875Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                </svg>
+                <input id="file-upload" name="profile_picture" type="file" class="hidden" onchange="displayFileName()">
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 flex justify-center pb-3 truncate"  id="file-name-display">Upload Profile Picture</h2>
+        </label>
+        <div class="flex justify-end">
+            <button id="cancel-btn" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="cancelUpload()">Cancel</button>
+            <button id="upload-btn" class="bg-green-500 text-white px-4 py-2 rounded-md ml-2" data-user-id="{{ user.USER_pkID }}" onclick="openUploadModal()">Save Picture</button>
+        </div>
+    </div>
+</div>
 
 
 {% endblock content%}

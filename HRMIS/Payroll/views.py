@@ -7,7 +7,9 @@ import json
 
 def dashboard_views(request, user_role):
     user_role = request.session.get('role', 'Guest')
-    return render(request, 'HR/dashboard.html', {'user_role': user_role})
+    users = User.objects.all().count()
+    active_users = User.objects.filter(role='JO', archived=False).count()
+    return render(request, 'HR/dashboard.html', {'user_role': user_role, 'users': users, 'active_users': active_users})
 
 def manage_payroll(request, user_role):
     return render(request, 'HR/manage_payroll.html', {'user_role': user_role})
@@ -20,15 +22,12 @@ def manage_employee(request, user_role):
 def create_user(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
-
         if form.is_valid():
             user = form.save()
             return JsonResponse({'success': True, 'message': 'User created successfully'})
         else:
-            # If the form is not valid, return the form errors
             return JsonResponse({'success': False, 'errors': form.errors})
     else:
-        # If the request is not a POST request, render the form
         form = UserCreationForm()
         return render(request, 'HR/manage_employee.html', {'form': form})
 
@@ -46,18 +45,28 @@ def archive_user(request, user_id):
         print(f"Error archiving user with ID {user_id}: {e}")
         return JsonResponse({'success': False, 'error': 'Internal server error'}, status=500)
     
-
+def unarchive_user(request, user_id):
+    print(f"Received user_id for unarchive: {user_id}")
+    try:
+        user = User.objects.get(USER_pkID=user_id)
+        user.archived = False
+        user.save()
+        return JsonResponse({'success': True})
+    except User.DoesNotExist as e:
+        print(f"User not found with ID {user_id}: {e}")
+        return JsonResponse({'success': False, 'error': 'User not found'}, status=404)
+    except Exception as e:
+        print(f"Error unarchiving user with ID {user_id}: {e}")
+        return JsonResponse({'success': False, 'error': 'Internal server error'}, status=500)
+    
 @csrf_exempt  
-
 def save_user_changes(request, user_pk_id):
     try:
         user = User.objects.get(USER_pkID=user_pk_id)
 
         if request.method == 'POST':
-            
             payload = json.loads(request.body.decode('utf-8'))
 
-          
             form = UserEditForm(payload, instance=user)
 
             if form.is_valid():
