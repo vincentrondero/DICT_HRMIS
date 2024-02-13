@@ -27,7 +27,6 @@ def employee_dashboard(request, user_role):
 
 
 @csrf_exempt
-@login_required
 def profile_view(request):
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
