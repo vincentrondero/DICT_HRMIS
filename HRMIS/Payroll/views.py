@@ -115,3 +115,141 @@ def edit_user(request, user_pk_id):
         import logging
         logging.error(str(e))
         return JsonResponse({'error': 'Internal server error'}, status=500)
+    
+from io import BytesIO
+import pandas as pd
+import numpy as np
+from django.http import HttpResponse
+from .models import CleansedData
+
+def extract_timestamps(cell):
+    if pd.notna(cell):
+        timestamps = [timestamp.strip()[:5] for timestamp in str(cell).split('\n')]
+        return timestamps
+    return [np.nan]
+
+def upload_and_cleanse(request):
+    if request.method == 'POST' and 'file' in request.FILES:
+        # Get the uploaded file
+        uploaded_file = request.FILES['file']
+
+        # Load user details
+        user_df = pd.read_excel(uploaded_file, sheet_name='Logs', header=None)
+
+        # Identify user dates dynamically
+        user_dates = user_df.iloc[3, 10::2].astype(str).tolist()
+
+        # Extract user details
+        users = []
+
+        # Iterate over rows, starting from row 5 and skipping every other row
+        for index in range(4, len(user_df), 2):
+            # New user details
+            user_details = {'No': user_df.iloc[index, 2], 'Name': user_df.iloc[index, 10]}
+            users.append(user_details)
+
+        # Create a DataFrame for user details
+        users_df = pd.DataFrame(users)
+
+        # Load attendance details
+        attendance_df = pd.read_excel(uploaded_file, sheet_name='Logs', header=None)
+
+        # Identify attendance dates dynamically
+        attendance_dates = attendance_df.iloc[3, 0::1].astype(str).tolist()
+
+        # Explicitly set the number of attendance columns based on the length of attendance_dates
+        num_attendance_columns = len(attendance_dates)
+
+        # Extract timestamp and timeout timestamp details for each cell
+        attendance_data = []
+
+        for index in range(5, len(attendance_df), 2):
+            # Extract attendance for the user at the current row
+            user_attendance = attendance_df.iloc[index, 0:(1 + num_attendance_columns * 2):1].tolist()
+
+            # Process each cell to extract timestamp and timeout timestamp
+            processed_attendance = []
+            for cell in user_attendance:
+                timestamps = extract_timestamps(cell)
+                first_instance = timestamps[0]
+
+                # Check if the last timestamp is present in the last line, otherwise take it from the previous line
+                last_instance = timestamps[-1] if '\n' in str(cell).strip()[-1] else timestamps[-2] if len(timestamps) > 1 else np.nan
+
+                processed_attendance.extend([first_instance, last_instance])
+
+            attendance_data.append(processed_attendance)
+
+        # Create a DataFrame for attendance details with first and last instances
+        columns = sum([[f'First_{col}', f'Last_{col}'] for col in attendance_dates], [])
+        attendance_df = pd.DataFrame(attendance_data, columns=columns[:num_attendance_columns*2])
+
+        # Extract the date range from the Excel sheet
+        date_range_str = user_df.iloc[2, 2:12].astype(str).tolist()[0]
+
+        # Remove leading and trailing spaces
+        date_range_str = date_range_str.strip()
+
+        # Split the date range string into start and end dates
+        start_date_str, end_date_str = date_range_str.split('~')
+
+        # Remove leading and trailing spaces from start and end dates
+        start_date_str = start_date_str.strip()
+        end_date_str = end_date_str.strip()
+
+        # Determine the year from the first date
+        common_year = pd.to_datetime(start_date_str, format='%Y/%m/%d').year
+
+        # Convert start and end dates to datetime objects
+        start_date = pd.to_datetime(start_date_str, format='%Y/%m/%d')
+        end_date = pd.to_datetime(f'{common_year}/{end_date_str}', format='%Y/%m/%d')
+
+        # Format the date strings
+        formatted_start_date = start_date.strftime('%B_%d')
+        formatted_end_date = end_date.strftime('%d_%Y')
+
+        # Generate the output Excel file name based on the formatted date range
+        date_range = f"{formatted_start_date}-{formatted_end_date}"
+        output_excel = f'attendance_{date_range}.xlsx'
+
+        # Merge user details and attendance details by row index
+        merged_df = pd.concat([users_df, attendance_df], axis=1)
+
+        # Save the merged DataFrame to an Excel file
+        merged_df.to_excel(output_excel, index=False)
+
+        # Save the cleansed data to a new Excel file
+        cleaned_output_excel = BytesIO()
+        merged_df.to_excel(cleaned_output_excel, index=False)
+        cleaned_output_excel.seek(0)
+
+        # Save the cleansed data to the database
+        cleansed_data_instance = CleansedData(file_name=output_excel, file_binary=cleaned_output_excel.read())
+        cleansed_data_instance.save()
+
+
+        return HttpResponse("File uploaded and cleansed successfully. Cleansed data saved to the database.")
+
+    return HttpResponse("File upload failed.")
+
+from .forms import CleansedDataSelectionForm
+def view_excel_content(request):
+    if request.method == 'POST':
+        form = CleansedDataSelectionForm(request.POST)
+
+        if form.is_valid():
+            # Retrieve the selected CleansedData instance
+            cleansed_data = form.cleaned_data['cleansed_data']
+
+            # Read the binary data and convert it to a DataFrame
+            binary_data = BytesIO(cleansed_data.file_binary)
+            df = pd.read_excel(binary_data)
+
+            # Convert the DataFrame to HTML for rendering
+            html_content = df.to_html()
+
+            return HttpResponse(html_content)
+    else:
+        form = CleansedDataSelectionForm()
+
+    return render(request, 'HR/manage_payroll.html', {'form': form})

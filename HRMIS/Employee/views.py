@@ -2,7 +2,6 @@ from django.shortcuts import render
 from Authentication.models import User, Profile
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 import base64
 
@@ -27,7 +26,6 @@ def employee_dashboard(request, user_role):
 
 
 @csrf_exempt
-@login_required
 def profile_view(request):
     if request.method == 'POST':
         user_id = request.POST.get('user_id')

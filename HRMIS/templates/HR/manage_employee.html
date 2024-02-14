@@ -168,12 +168,72 @@
     </div>
 </div>
 
-<div id="unarchiveModal" class="modal">
-    <div class="modal-content text-right">
-        <p class="mt-10 font-semibold">Are you sure you want to unarchive this user?</p>
-        <button id="cancelUnarchive" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mt-10" onclick="closeUnarchiveModal()">Cancel</button>
-        <button id="confirmUnarchive" class="bg-green-500 hover:bg-green-400 hover:text-white text-gray-200 font-bold py-2 px-6 rounded mt-10" onclick="unarchiveUser()">Unarchive</button>
+<div data-dial-init class="fixed right-6 bottom-6 group">
+    <div id="speed-dial-menu-square" class="flex flex-col items-center hidden mb-4 space-y-2">
+        <!-- Share button -->
+        <div class="flex items-cente">
+            <button type="button" data-tooltip-target="tooltip-share" data-tooltip-placement="left" class="flex justify-center items-center w-[64px] h-[64px] text-gray-800 bg-white-500 bg-opacity-25 dark:hover:text-white dark:text-gray-400 relative mb-5">
+                <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M15.9915 1.035C16.6394 0.661105 17.3793 0.47641 18.1269 0.501895C18.8746 0.527381 19.6001 0.762026 20.2211 1.17918C20.8421 1.59633 21.3337 2.17927 21.64 2.86179C21.9463 3.54431 22.0551 4.29905 21.9539 5.04028C21.8528 5.78151 21.5459 6.47953 21.0679 7.05506C20.59 7.63058 19.9602 8.06054 19.2502 8.2961C18.5401 8.53166 17.7783 8.56338 17.0511 8.38766C16.3239 8.21193 15.6606 7.83581 15.1365 7.302L8.85647 10.928C9.05122 11.6294 9.05122 12.3706 8.85647 13.072L15.1365 16.698C15.8193 16.0055 16.731 15.5854 17.7011 15.5161C18.6711 15.4469 19.6332 15.7332 20.4075 16.3217C21.1818 16.9101 21.7154 17.7604 21.9084 18.7136C22.1015 19.6668 21.9408 20.6576 21.4565 21.501C20.9705 22.3458 20.1929 22.9841 19.2696 23.2961C18.3463 23.6081 17.3408 23.5723 16.4421 23.1953C15.5434 22.8184 14.8131 22.1263 14.3886 21.249C13.9641 20.3718 13.8744 19.3697 14.1365 18.431L7.85647 14.804C7.29972 15.371 6.58679 15.7594 5.80852 15.9197C5.03024 16.08 4.22185 16.005 3.48635 15.7043C2.75084 15.4035 2.12151 14.8906 1.67854 14.231C1.23558 13.5713 0.999023 12.7946 0.999023 12C0.999023 11.2054 1.23558 10.4288 1.67854 9.76905C2.12151 9.10936 2.75084 8.59646 3.48635 8.29571C4.22185 7.99497 5.03024 7.91998 5.80852 8.08031C6.58679 8.24065 7.29972 8.62904 7.85647 9.196L14.1365 5.57C13.8995 4.7154 13.9531 3.80628 14.2888 2.98544C14.6246 2.1646 15.2235 1.47853 15.9915 1.035ZM19.7235 3.5C19.5931 3.27071 19.4187 3.06947 19.2102 2.90787C19.0018 2.74627 18.7634 2.62749 18.5089 2.55838C18.2543 2.48928 17.9886 2.4712 17.7271 2.5052C17.4655 2.53919 17.2132 2.62459 16.9848 2.75648C16.7564 2.88836 16.5563 3.06412 16.3961 3.27364C16.2359 3.48317 16.1187 3.72231 16.0513 3.97731C15.9839 4.23231 15.9675 4.49812 16.0033 4.75945C16.039 5.02078 16.1261 5.27246 16.2595 5.5C16.5266 5.95562 16.963 6.28709 17.4736 6.42208C17.9842 6.55707 18.5275 6.48463 18.9849 6.22055C19.4422 5.95648 19.7766 5.52222 19.915 5.01253C20.0533 4.50285 19.9845 3.95912 19.7235 3.5ZM3.07147 12.527C3.15253 12.8219 3.30009 13.0943 3.50282 13.3234C3.70555 13.5524 3.95805 13.7319 4.24095 13.8482C4.52386 13.9644 4.82963 14.0143 5.13482 13.994C5.44 13.9737 5.73647 13.8837 6.00147 13.731C6.32501 13.544 6.58968 13.2701 6.76548 12.9403C6.94129 12.6106 7.02119 12.2382 6.99614 11.8653C6.97108 11.4925 6.84207 11.1341 6.62373 10.8309C6.40538 10.5276 6.10645 10.2916 5.7608 10.1495C5.41516 10.0075 5.03663 9.96514 4.66815 10.0273C4.29966 10.0894 3.95594 10.2535 3.67597 10.501C3.396 10.7485 3.19097 11.0695 3.08413 11.4276C2.97728 11.7857 2.9729 12.1666 3.07147 12.527ZM18.9915 17.769C18.7639 17.6356 18.5123 17.5485 18.2509 17.5128C17.9896 17.4771 17.7238 17.4934 17.4688 17.5608C17.2138 17.6282 16.9746 17.7454 16.7651 17.9056C16.5556 18.0658 16.3798 18.2659 16.2479 18.4943C16.1161 18.7228 16.0307 18.975 15.9967 19.2366C15.9627 19.4981 15.9807 19.7638 16.0499 20.0184C16.119 20.2729 16.2377 20.5113 16.3993 20.7198C16.5609 20.9282 16.7622 21.1026 16.9915 21.233C17.4506 21.494 17.9943 21.5629 18.504 21.4245C19.0137 21.2861 19.4479 20.9518 19.712 20.4944C19.9761 20.037 20.0485 19.4938 19.9135 18.9832C19.7786 18.4726 19.4471 18.0361 18.9915 17.769Z" fill="black"/>
+                </svg>
+                <span class="sr-only">Share</span>
+                <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2">Share</span>
+            </button>
+        </div>
+        <div id="tooltip-share" role="tooltip" class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+            Share
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+
+
+        <button type="button" data-tooltip-target="tooltip-share" data-tooltip-placement="left" class="flex justify-center items-center w-[64px] h-[64px] text-gray-800 bg-white-500 bg-opacity-25 dark:hover:text-white dark:text-gray-400 relative mb-5">
+            <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.0001 7.84597H7.00015V4.61597H17.0001V7.84597ZM17.6151 12.116C17.8985 12.116 18.1361 12.02 18.3281 11.828C18.5201 11.636 18.6158 11.3983 18.6151 11.115C18.6151 10.8316 18.5195 10.5943 18.3281 10.403C18.1368 10.2116 17.8991 10.1156 17.6151 10.115C17.3318 10.115 17.0945 10.211 16.9031 10.403C16.7118 10.595 16.6158 10.8323 16.6151 11.115C16.6151 11.3983 16.7111 11.636 16.9031 11.828C17.0951 12.02 17.3325 12.1156 17.6151 12.115M16.0001 19V14.462H8.00015V19H16.0001ZM17.0001 20H7.00015V16H3.57715V10.615C3.57715 10.0483 3.76948 9.5733 4.15415 9.18997C4.53882 8.80663 5.01315 8.61497 5.57715 8.61497H18.4231C18.9898 8.61497 19.4648 8.80663 19.8481 9.18997C20.2315 9.5733 20.4231 10.0483 20.4231 10.615V16H17.0001V20Z" fill="black"/>
+            </svg>
+            <span class="sr-only">Print</span>
+            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2">Print</span>
+        </button>
+        <div id="tooltip-print" role="tooltip" class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700 left-0">
+            Print
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+
+
+        <button type="button" data-tooltip-target="tooltip-share" data-tooltip-placement="left" class="flex justify-center items-center w-[64px] h-[64px] text-gray-800 bg-white-500 bg-opacity-25 dark:hover:text-white dark:text-gray-400 relative mb-5">
+            <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C11.7348 2 11.4804 2.10536 11.2929 2.29289C11.1054 2.48043 11 2.73478 11 3V5H5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V7C21 6.46957 20.7893 5.96086 20.4142 5.58579C20.0391 5.21071 19.5304 5 19 5H13V3C13 2.73478 12.8946 2.48043 12.7071 2.29289C12.5196 2.10536 12.2652 2 12 2ZM13 5V13.828L14.828 12C15.0155 11.8124 15.2699 11.7069 15.5351 11.7068C15.8004 11.7067 16.0549 11.812 16.2425 11.9995C16.4301 12.187 16.5356 12.4414 16.5357 12.7066C16.5358 12.9719 16.4305 13.2264 16.243 13.414L12.883 16.773C12.6486 17.0072 12.3308 17.1387 11.9995 17.1387C11.6682 17.1387 11.3504 17.0072 11.116 16.773L7.757 13.414C7.66416 13.3211 7.59052 13.2108 7.5403 13.0894C7.49008 12.9681 7.46425 12.838 7.4643 12.7066C7.46434 12.5753 7.49026 12.4452 7.54057 12.3239C7.59088 12.2026 7.66459 12.0923 7.7575 11.9995C7.85041 11.9067 7.9607 11.833 8.08207 11.7828C8.20343 11.7326 8.3335 11.7068 8.46485 11.7068C8.5962 11.7068 8.72626 11.7328 8.84759 11.7831C8.96892 11.8334 9.07916 11.9071 9.172 12L11 13.828V5H13Z" fill="black"/>
+            </svg>
+            <span class="sr-only">Download</span>
+            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2">Download</span>
+        </button>
+        <div id="tooltip-download" role="tooltip" class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700 left-0">
+            Download
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+
     </div>
+
+    <button type="button" data-dial-toggle="speed-dial-menu-square" aria-controls="speed-dial-menu-default" aria-expanded="false" class="flex items-center justify-center text-white bg-blue-700 rounded-full w-14 h-14 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800">
+        <svg class="w-4 h-4 transition-transform group-hover:rotate-45" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
+        </svg>
+        <span class="sr-only">Open actions menu</span>
+    </button>
 </div>
 
+
+
+<script>
+// JavaScript to toggle the visibility of the speed dial menu
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleButton = document.querySelector('[data-dial-toggle]');
+    const menu = document.querySelector('#speed-dial-menu-square');
+
+    toggleButton.addEventListener('click', function () {
+        menu.classList.toggle('hidden');
+        const expanded = toggleButton.getAttribute('aria-expanded') === 'true' || false;
+        toggleButton.setAttribute('aria-expanded', !expanded);
+    });
+});
+</script>
 {% endblock content %}

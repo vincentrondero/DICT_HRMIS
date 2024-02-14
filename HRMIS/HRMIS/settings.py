@@ -77,14 +77,15 @@ WSGI_APPLICATION = 'HRMIS.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'HRMIS_DB',
-        'USER': 'postgres',
-        'PASSWORD': 'milotic03',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'HRMIS_DB',
+    'USER': 'celismonalennejoy',
+    'PASSWORD': 'DKrA2MwZlk1s',
+    'HOST': 'ep-noisy-dream-a1n7d96w.ap-southeast-1.aws.neon.tech',
+    'PORT': '5432',
+    'OPTIONS': {'sslmode': 'require'},
+  }
 }
 
 

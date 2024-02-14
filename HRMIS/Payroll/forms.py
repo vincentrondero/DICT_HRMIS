@@ -40,3 +40,7 @@ class UserEditForm(forms.ModelForm):
 
         return user
 
+from .models import CleansedData
+
+class CleansedDataSelectionForm(forms.Form):
+    cleansed_data = forms.ModelChoiceField(queryset=CleansedData.objects.all(), empty_label=None)

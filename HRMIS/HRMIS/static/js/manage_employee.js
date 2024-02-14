@@ -288,3 +288,15 @@ function saveNewUser() {
     };
     xhr.send(formData);
 }
+
+// script.js
+
+function toggleSpeedDial() {
+    const speedDialMenu = document.querySelector('.fixed .hidden');
+    speedDialMenu.classList.toggle('hidden');
+}
+
+// Add an event listener to the button
+const toggleButton = document.querySelector('.fixed button');
+toggleButton.addEventListener('click', toggleSpeedDial);
+
