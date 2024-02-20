@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
 //Open Unarchive Modal
 function openUnarchiveModal(userId) {
     var unarchiveModal = document.getElementById('unarchiveModal');
+    console.log('clicked button')
     if (unarchiveModal) {
         unarchiveModal.style.display = 'block';
 
@@ -289,14 +290,59 @@ function saveNewUser() {
     xhr.send(formData);
 }
 
-// script.js
-
-function toggleSpeedDial() {
-    const speedDialMenu = document.querySelector('.fixed .hidden');
-    speedDialMenu.classList.toggle('hidden');
+function showActiveSearch() {
+    document.getElementById('activeSearchForm').style.display = 'block';
+    document.getElementById('archiveSearchForm').style.display = 'none';
 }
 
-// Add an event listener to the button
-const toggleButton = document.querySelector('.fixed button');
-toggleButton.addEventListener('click', toggleSpeedDial);
+function showArchiveSearch() {
+    document.getElementById('archiveSearchForm').style.display = 'block';
+    document.getElementById('activeSearchForm').style.display = 'none';
+}
 
+function search() {
+    const searchText = document.getElementById('simple-search').value.toLowerCase(); 
+    const tableRows = document.querySelectorAll('#activeTable tbody tr'); 
+    let found = false;
+
+    tableRows.forEach(row => {
+        const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase(); 
+        const id = row.querySelector('td:nth-child(2)').textContent.toLowerCase(); 
+        if (searchText === '' || name.includes(searchText) || id.includes(searchText)) {
+            row.style.display = 'table-row';
+            found = true; 
+        } else {
+            row.style.display = 'none'; 
+        }
+    });
+
+    const errorMessageRow = document.getElementById('noResultsMessage');
+    errorMessageRow.style.display = found ? 'none' : 'table-row';
+}
+
+function searchArchive() {
+    const searchText = document.getElementById('archive-search').value.toLowerCase(); 
+    const tableRows = document.querySelectorAll('#archiveTable tbody tr'); 
+    let found = false;
+
+    tableRows.forEach(row => {
+        const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase(); 
+        const id = row.querySelector('td:nth-child(2)').textContent.toLowerCase(); 
+        if (searchText === '' || name.includes(searchText) || id.includes(searchText)) {
+            row.style.display = 'table-row'; 
+            found = true; 
+        } else {
+            row.style.display = 'none'; 
+        }
+    });
+
+    const errorMessageRow = document.getElementById('archivedResultsMessage');
+    errorMessageRow.style.display = found ? 'none' : 'table-row';
+}
+
+document.getElementById('simple-search').addEventListener('input', search);
+document.getElementById('archive-search').addEventListener('input', searchArchive);
+document.getElementById('activeButton').addEventListener('click', showActiveSearch);
+document.getElementById('archiveButton').addEventListener('click', showArchiveSearch);
+
+showActiveSearch();

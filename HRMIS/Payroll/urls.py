@@ -1,6 +1,7 @@
 from django.urls import path
 from. import views
-from .views import archive_user, save_user_changes, unarchive_user,  view_excel_content
+from .views import SaveAttendanceView
+from .views import archive_user, save_user_changes, unarchive_user,calculate_salary
 
 urlpatterns = [
     path('dashboard_views/<str:user_role>', views.dashboard_views, name="dashboard_views"),
@@ -12,5 +13,9 @@ urlpatterns = [
     path('edit_user/<int:user_pk_id>/', views.edit_user, name='edit_user'),
     path('save_user_changes/<int:user_pk_id>/', save_user_changes, name='save_user_changes'),
     path('upload_and_cleanse/', views.upload_and_cleanse, name='upload_and_cleanse'),
-    path('view-excel/', view_excel_content, name='view_excel_content'),
+    path('view_excel_content/<int:cleansed_data_id>/', views.view_excel_content, name='view_excel_content'),
+    path('save-attendance/', SaveAttendanceView.as_view(), name='save-attendance'),
+    path('manage_payroll/get_latest_attendance/<str:username>/', views.get_latest_attendance, name='get_latest_attendance'),
+    path('calculate_salary/<str:username>/', calculate_salary, name='calculate_salary'),
+
 ]

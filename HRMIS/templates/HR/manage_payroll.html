@@ -1,39 +1,56 @@
 {% extends "base.html" %}
+{% load static %}
+{% block manage_payroll_js %}<script src ={% static "js/manage_payroll.js" %}> </script>{% endblock manage_payroll_js %}
 {% block content %}
-<form method="post" enctype="multipart/form-data" action="{% url 'upload_and_cleanse' %}">
-    {% csrf_token %}
-    <div class="max-w-md bg-white shadow-custom rounded-xl m-2">
-        <label for="file-upload" class="max-w-md bg-white shadow-custom rounded-md m-2 cursor-pointer">
-            <div class="flex items-center justify-center">
-                <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M77.75 92.1875H23.4375C20.875 92.1875 18.75 90.0625 18.75 87.5C18.75 84.9375 20.875 82.8125 23.4375 82.8125H77.75L67 72.0625C65.1875 70.25 65.1875 67.25 67 65.4375C68.8125 63.625 71.8125 63.625 73.625 65.4375L92.375 84.1875C92.8125 84.625 93.125 85.125 93.375 85.6875C93.875 86.8125 93.875 88.125 93.375 89.25C93.125 89.8125 92.8125 90.3125 92.375 90.75L73.625 109.5C72.6875 110.438 71.5 110.875 70.3125 110.875C69.125 110.875 67.9375 110.438 67 109.5C66.1283 108.618 65.6394 107.428 65.6394 106.188C65.6394 104.947 66.1283 103.757 67 102.875L77.75 92.125V92.1875ZM131.25 59.375V112.5C131.25 122 123.562 129.688 114.062 129.688H67.1875C57.6875 129.688 50 122 50 112.5V106.25C50 103.688 52.125 101.562 54.6875 101.562C57.25 101.562 59.375 103.688 59.375 106.25V112.5C59.375 116.812 62.875 120.312 67.1875 120.312H114.062C118.375 120.312 121.875 116.812 121.875 112.5V64.0625H92.1875C89.625 64.0625 87.5 61.9375 87.5 59.375V29.6875H67.1875C62.875 29.6875 59.375 33.1875 59.375 37.5V68.75C59.375 71.3125 57.25 73.4375 54.6875 73.4375C52.125 73.4375 50 71.3125 50 68.75V37.5C50 28 57.6875 20.3125 67.1875 20.3125H92.1875C93.4375 20.3125 94.625 20.8125 95.5 21.6875L129.875 56.0625C130.75 56.9375 131.25 58.125 131.25 59.375ZM96.875 54.6875H115.25L96.875 36.3125V54.6875Z" fill="#0F5FC2" fill-opacity="0.760784"/>
-                </svg> 
-                <input id="file-upload" type="file" name="file" class="hidden">
-            </div>
-            <h2 class="text-xl font-semibold text-gray-800 flex justify-center pb-3">Import Data</h2>
-        </label>
-        <button type="submit">Upload and Cleanse</button>
+<div data-dial-init class="fixed right-6 bottom-6 group">
+    <div id="speed-dial-menu-square" class="flex flex-col items-center hidden mb-4 space-y-4 ">
+        <button type="button" class="flex justify-center items-center bg-blue-500 rounded-full p-3 shadow-custom relative hover:bg-green-500 hover:text-green-500">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14.5 5.5L18.5 9.5M3 21H7L20 8C20.5304 7.46956 20.8284 6.75014 20.8284 6C20.8284 5.24985 20.5304 4.53043 20 4C19.4696 3.46956 18.7501 3.17157 18 3.17157C17.2499 3.17157 16.5304 3.46956 16 4L3 17V21Z" stroke="#FCFCFC" stroke-opacity="0.760784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 8L7 3L3 7L8 12M7 8L5.5 9.5M16 12L21 17L17 21L12 16M16 17L14.5 18.5" stroke="#FFFFFF" stroke-opacity="0.760784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>            
+            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2 font-semibold">Working</span>
+        </button>
+        <button onclick="openCleansedDataModal()" type="button" class="flex justify-center items-center bg-blue-400 rounded-full p-3 shadow-custom relative hover:bg-green-400 hover:text-green-400">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 3H5C4.46957 3 3.96086 3.21071 3.58579 3.58579C3.21071 3.96086 3 4.46957 3 5V9M9 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V9M9 3V21M3 9V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H9M3 9H21M21 9V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H9" stroke="#FFFFFF" stroke-opacity="0.760784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>            
+            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2 font-semibold">Excels</span>
+        </button>
+        <button onclick="openImportModal()" type="button" class="flex justify-center items-center bg-blue-300 rounded-full p-3 shadow-custom relative hover:bg-green-300 hover:text-green-300">
+            <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.44 14.75H3.75C3.34 14.75 3 14.41 3 14C3 13.59 3.34 13.25 3.75 13.25H12.44L10.72 11.53C10.43 11.24 10.43 10.76 10.72 10.47C11.01 10.18 11.49 10.18 11.78 10.47L14.78 13.47C14.85 13.54 14.9 13.62 14.94 13.71C15.02 13.89 15.02 14.1 14.94 14.28C14.9 14.37 14.85 14.45 14.78 14.52L11.78 17.52C11.63 17.67 11.44 17.74 11.25 17.74C11.06 17.74 10.87 17.67 10.72 17.52C10.5805 17.3789 10.5023 17.1884 10.5023 16.99C10.5023 16.7916 10.5805 16.6011 10.72 16.46L12.44 14.74V14.75ZM21 9.5V18C21 19.52 19.77 20.75 18.25 20.75H10.75C9.23 20.75 8 19.52 8 18V17C8 16.59 8.34 16.25 8.75 16.25C9.16 16.25 9.5 16.59 9.5 17V18C9.5 18.69 10.06 19.25 10.75 19.25H18.25C18.94 19.25 19.5 18.69 19.5 18V10.25H14.75C14.34 10.25 14 9.91 14 9.5V4.75H10.75C10.06 4.75 9.5 5.31 9.5 6V11C9.5 11.41 9.16 11.75 8.75 11.75C8.34 11.75 8 11.41 8 11V6C8 4.48 9.23 3.25 10.75 3.25H14.75C14.95 3.25 15.14 3.33 15.28 3.47L20.78 8.97C20.92 9.11 21 9.3 21 9.5ZM15.5 8.75H18.44L15.5 5.81V8.75Z" fill="#FFFFFF" fill-opacity="0.760784"/>
+            </svg>                
+            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2 font-semibold">Import</span>
+        </button>
     </div>
-</form>
+
+    <button type="button" data-dial-toggle="speed-dial-menu-square" aria-controls="speed-dial-menu-default" aria-expanded="false" class="flex items-center justify-center text-white rounded-full w-14 h-14 transform transition duration-300 ease-in-out ">
+        <svg class="w-4 h-4 transition-transform group-hover:rotate-45" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
+        </svg>
+    </button>
+</div>
 
 <div class="py-3">
     <table class="shadow-custom" style="margin-left: 1%; width: 98%;">
         <thead class="bg-custom-blue text-white" >
             <tr>
-                <th>No:</th>
                 <th>Name</th>
-                <th>Role</th>
+                <th>Employee ID</th>
+                <th>Salary Grade</th>
                 <th>Attendance</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody class="bg-white">
+            {% for user in users_with_attendance %}
             <tr>
-                <td  class="text-center align-middle" style="padding-top: 20px; padding-bottom: 20px">sample</td>
-                <td  class="text-center align-middle" style="padding-top: 20px; padding-bottom: 20px">sample</td>
-                <td  class="text-center align-middle "style="padding-top: 20px; padding-bottom: 20px">sample</td>
+                <td class="text-center align-middle" style="padding-top: 20px; padding-bottom: 20px">{{ user.name }}</td>
+                <td class="text-center align-middle" style="padding-top: 20px; padding-bottom: 20px">{{ user.username }}</td>
+                <td class="text-center align-middle" style="padding-top: 20px; padding-bottom: 20px">{{ user.salary_grade }}</td>
                 <td class="flex items-center justify-center" style="padding-top: 20px; padding-bottom: 20px">
-                    <button class="flex items-center bg-custom-blue text-white text-xs p-2 rounded-md">
+                    <button class="flex items-center bg-custom-blue text-white text-xs p-2 rounded-md" onclick="showUserAttendance('{{ user.username }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg mr-1" viewBox="0 0 24 24">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M20 4H4C3.73478 4 3.48043 4.10536 3.29289 4.29289C3.10536 4.48043 3 4.73478 3 5V19C3 19.2652 3.10536 19.5196 3.29289 19.7071C3.48043 19.8946 3.73478 20 4 20H20C20.2652 20 20.5196 19.8946 20.7071 19.7071C20.8946 19.5196 21 19.2652 21 19V5C21 4.73478 20.8946 4.48043 20.7071 4.29289C20.5196 4.10536 20.2652 4 20 4ZM4 2C3.20435 2 2.44129 2.31607 1.87868 2.87868C1.31607 3.44129 1 4.20435 1 5V19C1 19.7956 1.31607 20.5587 1.87868 21.1213C2.44129 21.6839 3.20435 22 4 22H20C20.7956 22 21.5587 21.6839 22.1213 21.1213C22.6839 20.5587 23 19.7956 23 19V5C23 4.20435 22.6839 3.44129 22.1213 2.87868C21.5587 2.31607 20.7956 2 20 2H4ZM6 7H8V9H6V7ZM11 7C10.7348 7 10.4804 7.10536 10.2929 7.29289C10.1054 7.48043 10 7.73478 10 8C10 8.26522 10.1054 8.51957 10.2929 8.70711C10.4804 8.89464 10.7348 9 11 9H17C17.2652 9 17.5196 8.89464 17.7071 8.70711C17.8946 8.51957 18 8.26522 18 8C18 7.73478 17.8946 7.48043 17.7071 7.29289C17.5196 7.10536 17.2652 7 17 7H11ZM8 11H6V13H8V11ZM10 12C10 11.7348 10.1054 11.4804 10.2929 11.2929C10.4804 11.1054 10.7348 11 11 11H17C17.2652 11 17.5196 11.1054 17.7071 11.2929C17.8946 11.4804 18 11.7348 18 12C18 12.2652 17.8946 12.5196 17.7071 12.7071C17.5196 12.8946 17.2652 13 17 13H11C10.7348 13 10.4804 12.8946 10.2929 12.7071C10.1054 12.5196 10 12.2652 10 12ZM8 15H6V17H8V15ZM10 16C10 15.7348 10.1054 15.4804 10.2929 15.2929C10.4804 15.1054 10.7348 15 11 15H17C17.2652 15 17.5196 15.1054 17.7071 15.2929C17.8946 15.4804 18 15.7348 18 16C18 16.2652 17.8946 16.5196 17.7071 16.7071C17.5196 16.8946 17.2652 17 17 17H11C10.7348 17 10.4804 16.8946 10.2929 16.7071C10.1054 16.5196 10 16.2652 10 16Z"/>
                         </svg>
@@ -41,15 +58,11 @@
                     </button>                    
                 </td>
                 <td class="text-center align-middle" style="padding-top: 20px; padding-bottom: 20px">
-                    <button class="bg-custom-button1 p-2 rounded-md relative group">
+                    <button class="bg-custom-button1 p-2 rounded-md" onclick="calculateSalary('{{ user.username }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg text-custom-color-blue" viewBox="0 0 24 24">
                             <path d="M23.205 11.745C22.3229 9.46324 20.7915 7.48996 18.8001 6.06906C16.8088 4.64817 14.4447 3.84193 12 3.75C9.55544 3.84193 7.19134 4.64817 5.19995 6.06906C3.20856 7.48996 1.67717 9.46324 0.795047 11.745C0.735473 11.9098 0.735473 12.0902 0.795047 12.255C1.67717 14.5368 3.20856 16.51 5.19995 17.9309C7.19134 19.3518 9.55544 20.1581 12 20.25C14.4447 20.1581 16.8088 19.3518 18.8001 17.9309C20.7915 16.51 22.3229 14.5368 23.205 12.255C23.2646 12.0902 23.2646 11.9098 23.205 11.745ZM12 18.75C8.02505 18.75 3.82505 15.8025 2.30255 12C3.82505 8.1975 8.02505 5.25 12 5.25C15.975 5.25 20.175 8.1975 21.6975 12C20.175 15.8025 15.975 18.75 12 18.75Z" fill="#0F5FC2" fill-opacity="0.760784"/>
                             <path d="M12 7.5C11.11 7.5 10.24 7.76392 9.49994 8.25839C8.75991 8.75285 8.18314 9.45566 7.84254 10.2779C7.50195 11.1002 7.41283 12.005 7.58647 12.8779C7.7601 13.7508 8.18869 14.5526 8.81802 15.182C9.44736 15.8113 10.2492 16.2399 11.1221 16.4135C11.995 16.5872 12.8998 16.4981 13.7221 16.1575C14.5443 15.8169 15.2471 15.2401 15.7416 14.5001C16.2361 13.76 16.5 12.89 16.5 12C16.5 10.8065 16.0259 9.66193 15.182 8.81802C14.3381 7.97411 13.1935 7.5 12 7.5ZM12 15C11.4067 15 10.8266 14.8241 10.3333 14.4944C9.83994 14.1648 9.45543 13.6962 9.22836 13.148C9.0013 12.5999 8.94189 11.9967 9.05765 11.4147C9.1734 10.8328 9.45912 10.2982 9.87868 9.87868C10.2982 9.45912 10.8328 9.1734 11.4147 9.05764C11.9967 8.94189 12.5999 9.0013 13.1481 9.22836C13.6962 9.45542 14.1648 9.83994 14.4944 10.3333C14.8241 10.8266 15 11.4067 15 12C15 12.7956 14.6839 13.5587 14.1213 14.1213C13.5587 14.6839 12.7957 15 12 15Z"/>
                         </svg>
-                        <div class="opacity-0 w-28 bg-white text-black text-center text-xs rounded-lg py-2 absolute z-10 border-2 border-black group-hover:opacity-100 bottom-full -left-10 px-3 pointer-events-none shadow-md">
-                            View Payroll
-                            <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255" xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
-                        </div>
                     </button> 
                     <button class="bg-custom-button1 p-2 rounded-md">
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg text-custom-color-blue" viewBox="0 0 24 24">
@@ -63,104 +76,101 @@
                             <path d="M19 2H17V5H14C14.01 5.01 14 7 14 7H17V9.99C17.01 10 19 9.99 19 9.99V7H22V5H19V2ZM7 9H15V11H7V9ZM7 12V14H15V12H12H7ZM7 15H15V17H7V15Z" />
                         </svg>
                     </button>
-        
                 </td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
 
-<<<<<<< HEAD
-<form method="post" action="{% url 'view_excel_content' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="View Excel Content">
-  </form>
-  
-=======
-
-
-
-
-
-
-<div data-dial-init class="fixed right-6 bottom-6 group">
-    <div id="speed-dial-menu-square" class="flex flex-col items-center hidden mb-4 space-y-2">
-        <!-- Share button -->
-        <div class="flex items-center">
-            <button type="button" data-tooltip-target="tooltip-share" data-tooltip-placement="left" class="flex justify-center items-center w-[64px] h-[64px] text-gray-800 bg-white-500 bg-opacity-25 dark:hover:text-white dark:text-gray-400 relative">
-                <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M15.9915 1.035C16.6394 0.661105 17.3793 0.47641 18.1269 0.501895C18.8746 0.527381 19.6001 0.762026 20.2211 1.17918C20.8421 1.59633 21.3337 2.17927 21.64 2.86179C21.9463 3.54431 22.0551 4.29905 21.9539 5.04028C21.8528 5.78151 21.5459 6.47953 21.0679 7.05506C20.59 7.63058 19.9602 8.06054 19.2502 8.2961C18.5401 8.53166 17.7783 8.56338 17.0511 8.38766C16.3239 8.21193 15.6606 7.83581 15.1365 7.302L8.85647 10.928C9.05122 11.6294 9.05122 12.3706 8.85647 13.072L15.1365 16.698C15.8193 16.0055 16.731 15.5854 17.7011 15.5161C18.6711 15.4469 19.6332 15.7332 20.4075 16.3217C21.1818 16.9101 21.7154 17.7604 21.9084 18.7136C22.1015 19.6668 21.9408 20.6576 21.4565 21.501C20.9705 22.3458 20.1929 22.9841 19.2696 23.2961C18.3463 23.6081 17.3408 23.5723 16.4421 23.1953C15.5434 22.8184 14.8131 22.1263 14.3886 21.249C13.9641 20.3718 13.8744 19.3697 14.1365 18.431L7.85647 14.804C7.29972 15.371 6.58679 15.7594 5.80852 15.9197C5.03024 16.08 4.22185 16.005 3.48635 15.7043C2.75084 15.4035 2.12151 14.8906 1.67854 14.231C1.23558 13.5713 0.999023 12.7946 0.999023 12C0.999023 11.2054 1.23558 10.4288 1.67854 9.76905C2.12151 9.10936 2.75084 8.59646 3.48635 8.29571C4.22185 7.99497 5.03024 7.91998 5.80852 8.08031C6.58679 8.24065 7.29972 8.62904 7.85647 9.196L14.1365 5.57C13.8995 4.7154 13.9531 3.80628 14.2888 2.98544C14.6246 2.1646 15.2235 1.47853 15.9915 1.035ZM19.7235 3.5C19.5931 3.27071 19.4187 3.06947 19.2102 2.90787C19.0018 2.74627 18.7634 2.62749 18.5089 2.55838C18.2543 2.48928 17.9886 2.4712 17.7271 2.5052C17.4655 2.53919 17.2132 2.62459 16.9848 2.75648C16.7564 2.88836 16.5563 3.06412 16.3961 3.27364C16.2359 3.48317 16.1187 3.72231 16.0513 3.97731C15.9839 4.23231 15.9675 4.49812 16.0033 4.75945C16.039 5.02078 16.1261 5.27246 16.2595 5.5C16.5266 5.95562 16.963 6.28709 17.4736 6.42208C17.9842 6.55707 18.5275 6.48463 18.9849 6.22055C19.4422 5.95648 19.7766 5.52222 19.915 5.01253C20.0533 4.50285 19.9845 3.95912 19.7235 3.5ZM3.07147 12.527C3.15253 12.8219 3.30009 13.0943 3.50282 13.3234C3.70555 13.5524 3.95805 13.7319 4.24095 13.8482C4.52386 13.9644 4.82963 14.0143 5.13482 13.994C5.44 13.9737 5.73647 13.8837 6.00147 13.731C6.32501 13.544 6.58968 13.2701 6.76548 12.9403C6.94129 12.6106 7.02119 12.2382 6.99614 11.8653C6.97108 11.4925 6.84207 11.1341 6.62373 10.8309C6.40538 10.5276 6.10645 10.2916 5.7608 10.1495C5.41516 10.0075 5.03663 9.96514 4.66815 10.0273C4.29966 10.0894 3.95594 10.2535 3.67597 10.501C3.396 10.7485 3.19097 11.0695 3.08413 11.4276C2.97728 11.7857 2.9729 12.1666 3.07147 12.527ZM18.9915 17.769C18.7639 17.6356 18.5123 17.5485 18.2509 17.5128C17.9896 17.4771 17.7238 17.4934 17.4688 17.5608C17.2138 17.6282 16.9746 17.7454 16.7651 17.9056C16.5556 18.0658 16.3798 18.2659 16.2479 18.4943C16.1161 18.7228 16.0307 18.975 15.9967 19.2366C15.9627 19.4981 15.9807 19.7638 16.0499 20.0184C16.119 20.2729 16.2377 20.5113 16.3993 20.7198C16.5609 20.9282 16.7622 21.1026 16.9915 21.233C17.4506 21.494 17.9943 21.5629 18.504 21.4245C19.0137 21.2861 19.4479 20.9518 19.712 20.4944C19.9761 20.037 20.0485 19.4938 19.9135 18.9832C19.7786 18.4726 19.4471 18.0361 18.9915 17.769Z" fill="black"/>
-                </svg>
-                <span class="sr-only">Share</span>
-                <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2">Share</span>
-            </button>
-        </div>
-        <div id="tooltip-share" role="tooltip" class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-            Share
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
-
-
-        <button type="button" data-tooltip-target="tooltip-share" data-tooltip-placement="left" class="flex justify-center items-center w-[64px] h-[64px] text-gray-800 bg-white-500 bg-opacity-25 dark:hover:text-white dark:text-gray-400 relative">
-            <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17.0001 7.84597H7.00015V4.61597H17.0001V7.84597ZM17.6151 12.116C17.8985 12.116 18.1361 12.02 18.3281 11.828C18.5201 11.636 18.6158 11.3983 18.6151 11.115C18.6151 10.8316 18.5195 10.5943 18.3281 10.403C18.1368 10.2116 17.8991 10.1156 17.6151 10.115C17.3318 10.115 17.0945 10.211 16.9031 10.403C16.7118 10.595 16.6158 10.8323 16.6151 11.115C16.6151 11.3983 16.7111 11.636 16.9031 11.828C17.0951 12.02 17.3325 12.1156 17.6151 12.115M16.0001 19V14.462H8.00015V19H16.0001ZM17.0001 20H7.00015V16H3.57715V10.615C3.57715 10.0483 3.76948 9.5733 4.15415 9.18997C4.53882 8.80663 5.01315 8.61497 5.57715 8.61497H18.4231C18.9898 8.61497 19.4648 8.80663 19.8481 9.18997C20.2315 9.5733 20.4231 10.0483 20.4231 10.615V16H17.0001V20Z" fill="black"/>
-            </svg>
-            <span class="sr-only">Print</span>
-            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2">Print</span>
-        </button>
-        <div id="tooltip-print" role="tooltip" class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700 left-0">
-            Print
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
-        
-
-        <button type="button" data-tooltip-target="tooltip-share" data-tooltip-placement="left" class="flex justify-center items-center w-[64px] h-[64px] text-gray-800 bg-white-500 bg-opacity-25 dark:hover:text-white dark:text-gray-400 relative">
-            <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C11.7348 2 11.4804 2.10536 11.2929 2.29289C11.1054 2.48043 11 2.73478 11 3V5H5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V7C21 6.46957 20.7893 5.96086 20.4142 5.58579C20.0391 5.21071 19.5304 5 19 5H13V3C13 2.73478 12.8946 2.48043 12.7071 2.29289C12.5196 2.10536 12.2652 2 12 2ZM13 5V13.828L14.828 12C15.0155 11.8124 15.2699 11.7069 15.5351 11.7068C15.8004 11.7067 16.0549 11.812 16.2425 11.9995C16.4301 12.187 16.5356 12.4414 16.5357 12.7066C16.5358 12.9719 16.4305 13.2264 16.243 13.414L12.883 16.773C12.6486 17.0072 12.3308 17.1387 11.9995 17.1387C11.6682 17.1387 11.3504 17.0072 11.116 16.773L7.757 13.414C7.66416 13.3211 7.59052 13.2108 7.5403 13.0894C7.49008 12.9681 7.46425 12.838 7.4643 12.7066C7.46434 12.5753 7.49026 12.4452 7.54057 12.3239C7.59088 12.2026 7.66459 12.0923 7.7575 11.9995C7.85041 11.9067 7.9607 11.833 8.08207 11.7828C8.20343 11.7326 8.3335 11.7068 8.46485 11.7068C8.5962 11.7068 8.72626 11.7328 8.84759 11.7831C8.96892 11.8334 9.07916 11.9071 9.172 12L11 13.828V5H13Z" fill="black"/>
-            </svg>
-            <span class="sr-only">Download</span>
-            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2">Download</span>
-        </button>
-        <div id="tooltip-download" role="tooltip" class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700 left-0">
-            Download
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
-
+<div id="importDataModal" class="modal fixed hidden overflow-y-auto bg-gray-800 bg-opacity-75">
+    <div class="modal-content w-96 max-h-96">
+        <form method="post" enctype="multipart/form-data" action="{% url 'upload_and_cleanse' %}">
+            {% csrf_token %}
+            <label for="file-upload" class="max-w-md bg-white rounded-md cursor-pointer block">
+                <div class="flex items-center justify-center border-4 border-dashed rounded-xl">
+                    <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M77.75 92.1875H23.4375C20.875 92.1875 18.75 90.0625 18.75 87.5C18.75 84.9375 20.875 82.8125 23.4375 82.8125H77.75L67 72.0625C65.1875 70.25 65.1875 67.25 67 65.4375C68.8125 63.625 71.8125 63.625 73.625 65.4375L92.375 84.1875C92.8125 84.625 93.125 85.125 93.375 85.6875C93.875 86.8125 93.875 88.125 93.375 89.25C93.125 89.8125 92.8125 90.3125 92.375 90.75L73.625 109.5C72.6875 110.438 71.5 110.875 70.3125 110.875C69.125 110.875 67.9375 110.438 67 109.5C66.1283 108.618 65.6394 107.428 65.6394 106.188C65.6394 104.947 66.1283 103.757 67 102.875L77.75 92.125V92.1875ZM131.25 59.375V112.5C131.25 122 123.562 129.688 114.062 129.688H67.1875C57.6875 129.688 50 122 50 112.5V106.25C50 103.688 52.125 101.562 54.6875 101.562C57.25 101.562 59.375 103.688 59.375 106.25V112.5C59.375 116.812 62.875 120.312 67.1875 120.312H114.062C118.375 120.312 121.875 116.812 121.875 112.5V64.0625H92.1875C89.625 64.0625 87.5 61.9375 87.5 59.375V29.6875H67.1875C62.875 29.6875 59.375 33.1875 59.375 37.5V68.75C59.375 71.3125 57.25 73.4375 54.6875 73.4375C52.125 73.4375 50 71.3125 50 68.75V37.5C50 28 57.6875 20.3125 67.1875 20.3125H92.1875C93.4375 20.3125 94.625 20.8125 95.5 21.6875L129.875 56.0625C130.75 56.9375 131.25 58.125 131.25 59.375ZM96.875 54.6875H115.25L96.875 36.3125V54.6875Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                    </svg>
+                    <input id="file-upload" type="file" name="file" class="hidden" onchange="updateFileName(this)">
+                    <p id="file-name" class="text-sm text-gray-500 hidden">No file chosen</p>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800 flex justify-center pb-3">Import Data</h2>
+            </label>
+            <div class="flex justify-end">
+                <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="closeImportModal()">Close</button>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md ml-2">Save</button>
+            </div>
+        </form>
     </div>
+</div>   
+<div id="cleansedDataModal" class="modal fixed top-0 left-0 hidden">
+    <div class="modal-dialog flex items-center justify-center min-h-full">
+        <div class="modal-content bg-white max-w-full max-h-full p-6 rounded shadow-lg overflow-y-auto">
+            <div class="modal-body">
+                <table class="table-auto w-full">
+                    <thead>
+                        <tr id="row_{{ cleansed_data.id }}">
+                            <th class="px-4 py-2">File Name</th>
+                            <th class="px-4 py-2">Upload Date</th>
+                            <th class="px-4 py-2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cleansed_data in cleansed_data_list %}
+                            <tr>
+                                <td class="px-4 py-2">{{ cleansed_data.file_name }}</td>
+                                <td class="px-4 py-2">{{ cleansed_data.upload_date|date:"Y-m-d" }}</td>
+                                <td class=" flex space-x-2 px-4 py-2">
+                                    <button class="bg-custom-button1 text-white text-xs p-2 rounded-md" onclick="viewExcel({{ cleansed_data.id }})" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg" viewBox="0 0 24 24">
+                                            <path d="M23.205 11.745C22.3229 9.46324 20.7915 7.48996 18.8001 6.06906C16.8088 4.64817 14.4447 3.84193 12 3.75C9.55544 3.84193 7.19134 4.64817 5.19995 6.06906C3.20856 7.48996 1.67717 9.46324 0.795047 11.745C0.735473 11.9098 0.735473 12.0902 0.795047 12.255C1.67717 14.5368 3.20856 16.51 5.19995 17.9309C7.19134 19.3518 9.55544 20.1581 12 20.25C14.4447 20.1581 16.8088 19.3518 18.8001 17.9309C20.7915 16.51 22.3229 14.5368 23.205 12.255C23.2646 12.0902 23.2646 11.9098 23.205 11.745ZM12 18.75C8.02505 18.75 3.82505 15.8025 2.30255 12C3.82505 8.1975 8.02505 5.25 12 5.25C15.975 5.25 20.175 8.1975 21.6975 12C20.175 15.8025 15.975 18.75 12 18.75Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                                            <path d="M12 7.5C11.11 7.5 10.24 7.76392 9.49994 8.25839C8.75991 8.75285 8.18314 9.45566 7.84254 10.2779C7.50195 11.1002 7.41283 12.005 7.58647 12.8779C7.7601 13.7508 8.18869 14.5526 8.81802 15.182C9.44736 15.8113 10.2492 16.2399 11.1221 16.4135C11.995 16.5872 12.8998 16.4981 13.7221 16.1575C14.5443 15.8169 15.2471 15.2401 15.7416 14.5001C16.2361 13.76 16.5 12.89 16.5 12C16.5 10.8065 16.0259 9.66193 15.182 8.81802C14.3381 7.97411 13.1935 7.5 12 7.5ZM12 15C11.4067 15 10.8266 14.8241 10.3333 14.4944C9.83994 14.1648 9.45543 13.6962 9.22836 13.148C9.0013 12.5999 8.94189 11.9967 9.05765 11.4147C9.1734 10.8328 9.45912 10.2982 9.87868 9.87868C10.2982 9.45912 10.8328 9.1734 11.4147 9.05764C11.9967 8.94189 12.5999 9.0013 13.1481 9.22836C13.6962 9.45542 14.1648 9.83994 14.4944 10.3333C14.8241 10.8266 15 11.4067 15 12C15 12.7956 14.6839 13.5587 14.1213 14.1213C13.5587 14.6839 12.7957 15 12 15Z" fill="#0F5FC2"/>
+                                        </svg>
+                                    </button>
+                                    <button class="bg-green-400 p-2 rounded-md" onclick="saveAttendance({{ cleansed_data.id }})">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="text-lg" fill="none" viewBox="0 0 24 24">
+                                            <path d="M21.78 5.78C21.9125 5.63782 21.9846 5.44978 21.9812 5.25548C21.9777 5.06118 21.899 4.87579 21.7616 4.73838C21.6242 4.60096 21.4388 4.52225 21.2445 4.51882C21.0502 4.5154 20.8622 4.58752 20.72 4.72L13.22 12.22C13.1463 12.2887 13.0872 12.3715 13.0462 12.4635C13.0052 12.5555 12.9832 12.6548 12.9814 12.7555C12.9796 12.8562 12.9982 12.9562 13.0359 13.0496C13.0736 13.143 13.1297 13.2278 13.201 13.299C13.2722 13.3703 13.357 13.4264 13.4504 13.4641C13.5438 13.5018 13.6438 13.5204 13.7445 13.5186C13.8452 13.5168 13.9445 13.4948 14.0365 13.4538C14.1285 13.4128 14.2113 13.3537 14.28 13.28L21.78 5.78ZM21.947 7.028C21.982 7.197 22 7.371 22 7.55V14.45C22 14.7849 21.934 15.1165 21.8059 15.4258C21.6777 15.7352 21.4899 16.0163 21.2531 16.2531C21.0163 16.4899 20.7352 16.6777 20.4258 16.8059C20.1165 16.934 19.7849 17 19.45 17H4.55C4.21513 17 3.88354 16.934 3.57416 16.8059C3.26478 16.6777 2.98367 16.4899 2.74688 16.2531C2.51009 16.0163 2.32226 15.7352 2.19411 15.4258C2.06596 15.1165 2 14.7849 2 14.45V7.55C2 6.8737 2.26866 6.22509 2.74688 5.74688C3.2251 5.26866 3.8737 5 4.55 5H19.025L17.525 6.5H4.55C3.97 6.5 3.5 6.97 3.5 7.55V14.45C3.5 15.03 3.97 15.5 4.55 15.5H19.45C20.03 15.5 20.5 15.03 20.5 14.45V8.475L21.947 7.028ZM4.5 9.25C4.5 9.05109 4.57902 8.86032 4.71967 8.71967C4.86032 8.57902 5.05109 8.5 5.25 8.5H7.25C7.44891 8.5 7.63968 8.57902 7.78033 8.71967C7.92098 8.86032 8 9.05109 8 9.25C8 9.44891 7.92098 9.63968 7.78033 9.78033C7.63968 9.92098 7.44891 10 7.25 10H5.25C5.05109 10 4.86032 9.92098 4.71967 9.78033C4.57902 9.63968 4.5 9.44891 4.5 9.25ZM4.5 12.75C4.5 12.5511 4.57902 12.3603 4.71967 12.2197C4.86032 12.079 5.05109 12 5.25 12H10.25C10.4489 12 10.6397 12.079 10.7803 12.2197C10.921 12.3603 11 12.5511 11 12.75C11 12.9489 10.921 13.1397 10.7803 13.2803C10.6397 13.421 10.4489 13.5 10.25 13.5H5.25C5.05109 13.5 4.86032 13.421 4.71967 13.2803C4.57902 13.1397 4.5 12.9489 4.5 12.75Z" fill="white"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer flex justify-end">
+                <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="closeCleansedDataModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- Button toggling the menu -->
-    <button type="button" data-dial-toggle="speed-dial-menu-square" aria-controls="speed-dial-menu-default" aria-expanded="false" class="flex items-center justify-center text-white bg-blue-700 rounded-full w-14 h-14 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800">
-        <svg class="w-4 h-4 transition-transform group-hover:rotate-45" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-        </svg>
-        <span class="sr-only">Open actions menu</span>
-    </button>
+<div id="attendanceModal" class="modal fixed top-0 left-0 hidden">
+    <div class="modal-dialog flex items-center justify-center min-h-full">
+        <div class="modal-content bg-white max-w-full max-h-full p-6 rounded shadow-lg overflow-y-auto">
+            <div class="modal-body">
+                <table class="table-auto w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2">Date</th>
+                            <th class="px-4 py-2">Time In</th>
+                            <th class="px-4 py-2">Time Out</th>
+                            <th class="px-4 py-2">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userAttendanceDetails"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer flex justify-end">
+                <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="closeAttendanceModal()">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 
+<p id="dailySalary">Daily Salary: </p>
+<p id="monthlySalary">Monthly Salary: </p>
 
-<script>
-// JavaScript to toggle the visibility of the speed dial menu
-document.addEventListener('DOMContentLoaded', function () {
-    const toggleButton = document.querySelector('[data-dial-toggle]');
-    const menu = document.querySelector('#speed-dial-menu-square');
-
-    toggleButton.addEventListener('click', function () {
-        menu.classList.toggle('hidden');
-        const expanded = toggleButton.getAttribute('aria-expanded') === 'true' || false;
-        toggleButton.setAttribute('aria-expanded', !expanded);
-    });
-});
-</script>
-
-
-
-
-
-
-
-
-
->>>>>>> 53caf51f3bd4fed4e146927b34665d6dad92b399
 {% endblock content %}

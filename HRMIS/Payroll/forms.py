@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import date
 from Authentication.models import User
+from .models import CleansedData
 
 class UserCreationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -39,8 +40,3 @@ class UserEditForm(forms.ModelForm):
             user.save()
 
         return user
-
-from .models import CleansedData
-
-class CleansedDataSelectionForm(forms.Form):
-    cleansed_data = forms.ModelChoiceField(queryset=CleansedData.objects.all(), empty_label=None)
