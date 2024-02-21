@@ -9,7 +9,8 @@ from io import BytesIO
 import pandas as pd
 import numpy as np
 from .models import CleansedData
-from django.contrib import messages
+from django.db.models import Min, Max
+
 
 
 def dashboard_views(request, user_role):
@@ -23,7 +24,6 @@ def manage_payroll(request, user_role):
     latest_generated_dates = Attendance.objects.values('employee').annotate(latest_date=Max('generated_date'))
 
     users_with_attendance = User.objects.filter(attendance__generated_date__in=latest_generated_dates.values('latest_date'))
-    print(users_with_attendance)
     cleansed_data_list = CleansedData.objects.all()
 
     return render(request, 'HR/manage_payroll.html', {'user_role': user_role, 'cleansed_data_list': cleansed_data_list, 'users_with_attendance': users_with_attendance})
@@ -287,6 +287,7 @@ from .models import CleansedData, User, Attendance
 from datetime import datetime
 import math
 
+
 class SaveAttendanceView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -326,31 +327,18 @@ class SaveAttendanceView(View):
             # Assuming the Excel file format is supported by pandas (e.g., .xlsx)
             df = pd.read_excel(file_content_io)
 
-            # Find the index of the columns "First_1" and "Last_1"
-            first_col_index = df.columns.get_loc("First_1")
+            # Iterate through rows using iterrows
+            for index, row in df.iterrows():
+                employee_id = int(row['No'])
 
-            # Use filter to select columns starting from "First_" and ending with "Last_"
-            relevant_columns = df.filter(regex=f'^First_.*|Last_.*$')
+                filename_parts = cleansed_data.file_name.split('_')
+                month_str = filename_parts[1].capitalize()
+                year_str = filename_parts[3].split('.')[0]
 
-            # Check if there are any relevant columns
-            if not relevant_columns.empty:
-                for index, row in df.iterrows():
-                    employee_id = int(row['No'])
-
-                    filename_parts = cleansed_data.file_name.split('_')
-                    month_str = filename_parts[1].capitalize()
-                    year_str = filename_parts[3].split('.')[0]
-
-                    # Iterate through relevant columns
-                    for col_name in relevant_columns:
-                        col_index_str = col_name.split('_')[1]
-                        
-                        # Handle the case where col_index_str is a float or a string that can be converted to int
-                        try:
-                            col_index = int(float(col_index_str))  # Convert float to int
-                        except ValueError:
-                            print(f"Skipping row {index + 2} (Employee ID {employee_id}): Invalid column index")
-                            continue
+                # Iterate through relevant columns within each row
+                for col_name in df.columns:
+                    if col_name.startswith('First_') and col_name.replace('First_', '').isdigit():
+                        col_index = int(col_name.replace('First_', ''))
 
                         date_str = f"{month_str} {col_index}, {year_str}"
 
@@ -374,7 +362,7 @@ class SaveAttendanceView(View):
                             print(f"Skipping row {index + 2} (Employee ID {employee_id}): Both time entries are empty")
                             continue
 
-                        # Handle the case where one of the time entries is missing
+                        # Skip rows where one of the time entries is missing
                         if not time_in or not time_out:
                             print(f"Skipping row {index + 2} (Employee ID {employee_id}): Incomplete time entries")
                             continue
@@ -384,21 +372,29 @@ class SaveAttendanceView(View):
                         # Calculate the remark based on time_in, time_out, and date
                         remark = self.calculate_remark(time_in, time_out, date)
 
-                        # Creating the Attendance record
-                        Attendance.objects.create(
-                            employee_id=employee_id,
-                            date=date,
-                            time_in=time_in,
-                            time_out=time_out,
-                            excel_file=cleansed_data,
-                            remark=remark
-                        )
+                        # Check if an attendance record already exists for the employee and date
+                        existing_attendance = Attendance.objects.filter(employee_id=employee_id, date=date).first()
+
+                        if existing_attendance:
+                            print(f"Attendance record already exists for Employee ID {employee_id}, Date: {date}")
+                        else:
+                            # Creating the Attendance record
+                            Attendance.objects.create(
+                                employee_id=employee_id,
+                                date=date,
+                                time_in=time_in,
+                                time_out=time_out,
+                                excel_file=cleansed_data,
+                                remark=remark
+                            )
             else:
                 print("No relevant columns found.")
 
             return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)})
+
+
 
 # views.py
 from django.http import JsonResponse
@@ -422,24 +418,14 @@ def get_latest_attendance(request, username):
 
     return JsonResponse({'attendances': attendance_data})
 
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from Authentication.models import User
 
-
-from django.db.models import Count
-from django.utils import timezone
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from .models import User, Attendance
 
 def calculate_salary(request, username):
     if request.method == 'GET':
         # Your logic to fetch the user's salary grade
         user = get_object_or_404(User, username=username)
 
-        # Define a dictionary with predefined salary grades and their daily salaries
         salary_grades = {
             '1': 626.3636,
             '2': 662.6364,
@@ -484,37 +470,85 @@ def calculate_salary(request, username):
             # Get the daily salary based on the user's salary grade
             daily_salary = salary_grades[user_salary_grade_str]
 
-            # Fetch the latest generated_date with attendance "Full"
-            try:
-                latest_full_attendance = Attendance.objects.filter(
-                    employee=user,
-                    remark='FULL'
-                ).latest('generated_date')
-            except Attendance.DoesNotExist:
-                latest_full_attendance = None
+            # Fetch all attendance entries for the user
+            all_attendances = Attendance.objects.filter(
+                employee=user
+            )
+            min_date = all_attendances.aggregate(Min('date'))['date__min']
+            max_date = all_attendances.aggregate(Max('date'))['date__max']
+            date_range = f"{min_date.strftime('%B %d, %Y')} - {max_date.strftime('%B %d, %Y')}"
 
-            # Count the number of remarks where attendance is "Full"
-            full_attendance_count = 0
-            if latest_full_attendance:
-                full_attendance_count = Attendance.objects.filter(
-                    employee=user,
-                    remark='FULL',
-                    generated_date=latest_full_attendance.generated_date
-                ).count()
-
-            # Assuming 22 working days in a month
-            days_in_month = 22
+            # Count the number of remarks where attendance is "FULL", "HALF", or "ABSENT"
+            full_attendance_count = all_attendances.filter(remark='FULL').count()
+            half_attendance_count = all_attendances.filter(remark='HALF').count()
+            absent_attendance_count = all_attendances.filter(remark='ABSENT').count()
 
             # Calculate the monthly salary
-            monthly_salary = daily_salary * (days_in_month - full_attendance_count)
-            print(days_in_month - full_attendance_count)
+            full_day_salary = daily_salary * full_attendance_count
+            half_day_salary = (daily_salary * half_attendance_count)/2
+            monthly_salary = full_day_salary + half_day_salary
+
             return JsonResponse({
                 'daily_salary': daily_salary,
                 'monthly_salary': monthly_salary,
-                'full_attendance_count': full_attendance_count
+                'full_attendance_count': full_attendance_count,
+                'half_attendance_count': half_attendance_count,
+                'absent_attendance_count': absent_attendance_count,
+                'date_range': date_range,
             })
         else:
             return JsonResponse({'error': 'Invalid salary grade'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from .models import User, Payslip
+from .views import calculate_salary
+import json
+
+def activate_payslip(request, username):
+    print('Request method:', request.method)
+    if request.method == 'POST' or request.method == 'GET':
+        # Call the calculate_salary function to get the necessary data
+        salary_data = calculate_salary(request, username)
+
+        # Extract the JSON data from the response
+        salary_data_json = json.loads(salary_data.content.decode('utf-8'))
+
+        # Print the response from calculate_salary for debugging
+        print('Salary Data:', salary_data_json)
+
+        # Check if there is an error in the response from calculate_salary
+        if 'error' in salary_data_json:
+            return JsonResponse({'error': salary_data_json['error']})
+
+        try:
+            # Extract the data from the response
+            monthly_salary = salary_data_json['monthly_salary']
+            full_attendance_count = salary_data_json['full_attendance_count']
+            half_attendance_count = salary_data_json['half_attendance_count']
+            absent_attendance_count = salary_data_json['absent_attendance_count']
+            date_range = salary_data_json['date_range']
+
+            # Get the user object
+            user = get_object_or_404(User, username=username)
+
+            # Create and save the Payslip instance
+            payslip = Payslip.objects.create(
+                user=user,
+                monthly_salary=monthly_salary,
+                full_attendance_count=full_attendance_count,
+                half_attendance_count=half_attendance_count,
+                absent_attendance_count=absent_attendance_count,
+                date_range=date_range,
+                activated=True
+            )
+
+            return JsonResponse({'success': 'Payslip activated successfully'})
+        except KeyError as e:
+            # Handle the missing key in the response
+            return JsonResponse({'error': f'Missing key in salary data: {e}'})
     else:
         return JsonResponse({'error': 'Invalid request method'})
 

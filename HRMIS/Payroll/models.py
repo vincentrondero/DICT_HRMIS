@@ -28,3 +28,16 @@ class Attendance(models.Model):
     generated_date = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return f"{self.employee.username} - {self.date} - {self.get_remark_display()}"
+    
+class Payslip(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, to_field='username')
+    monthly_salary = models.FloatField()
+    full_attendance_count = models.IntegerField()
+    half_attendance_count = models.IntegerField()
+    absent_attendance_count = models.IntegerField()
+    date_range = models.CharField(max_length=255)
+    activated_date = models.DateTimeField(default=timezone.now)
+    activated = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.monthly_salary} - {self.activated}"

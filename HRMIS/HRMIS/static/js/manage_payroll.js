@@ -144,18 +144,90 @@ function calculateSalary(username) {
         method: 'GET',
         dataType: 'json',
         success: function(data) {
-            // Handle the response data and update UI
-            console.log(`Daily salary for ${username}: ${data.daily_salary}`);
-            console.log(`Monthly salary for ${username}: ${data.monthly_salary}`);
-
-            // Display the salary information in your HTML
-            $('#dailySalary').text(`Daily Salary: ${data.daily_salary}`);
-            $('#monthlySalary').text(`Monthly Salary: ${data.monthly_salary}`);
-
-            // Add your additional logic here to perform other actions if needed
+            // Update the modal content with the calculated values
+            $('#dailySalary').text(data.daily_salary);
+            $('#fullAttendanceCount').text(data.full_attendance_count);
+            $('#halfAttendanceCount').text(data.half_attendance_count);
+            $('#absentAttendanceCount').text(data.absent_attendance_count);
+            $('#monthlySalary').text(data.monthly_salary);
+            $('#dateRange').text(data.date_range);
+            // Show the modal
+            $('#salaryModal').show();
         },
         error: function(error) {
             console.error('Error calculating salary:', error);
         }
     });
 }
+
+// Close modal when clicking the close button
+function closeSalaryModal() {
+    $('#salaryModal').hide();
+}
+
+// Close modal when clicking outside the modal content
+$(window).click(function(event) {
+    if (event.target.id === 'salaryModal') {
+        $('#salaryModal').hide();
+    }
+});
+
+// Function to open the activate payslip modal
+function openActivatePayslipModal(username) {
+    $('#activatePayslipModal').attr('data-username', username);
+    $('#activatePayslipModal').show();
+}
+
+// Function to close the activate payslip modal
+function closeActivatePayslipModal() {
+    $('#activatePayslipModal').hide();
+}
+
+function activatePayslip() {
+    var username = $('#activatePayslipModal').data('username');
+    var csrftoken = getCookie('csrftoken');
+
+    // Use the correct HTTP method (GET) for calculate_salary endpoint
+    $.ajax({
+        url: `/hr_views/calculate_salary/${username}/`,
+        method: 'GET',  // Keep it as GET
+        dataType: 'json',
+        success: function(data) {
+            console.log('calculate_salary response:', data);
+
+            // Adjust the data format for the POST request
+            var postData = {
+                daily_salary: data.daily_salary,
+                monthly_salary: data.monthly_salary,
+                full_attendance_count: data.full_attendance_count,
+                half_attendance_count: data.half_attendance_count,
+                absent_attendance_count: data.absent_attendance_count,
+                date_range: data.date_range
+            };
+
+            // Use the returned data as the payload for the activate_payslip endpoint
+            $.ajax({
+                url: `/hr_views/activate_payslip/${username}/`,
+                method: 'POST',
+                data: postData,  // Send the adjusted data
+                dataType: 'json',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                success: function(response) {
+                    console.log('Payslip activated successfully:', response);
+                    // Optionally, perform additional actions or close the modal
+                },
+                error: function(error) {
+                    console.error('Error activating payslip:', error.responseText);
+                    // Display a user-friendly error message or handle the error
+                }
+            });
+        },
+        error: function(error) {
+            console.error('Error calculating salary:', error);
+            // Display a user-friendly error message or handle the error
+        }
+    });
+}
+

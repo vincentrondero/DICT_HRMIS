@@ -2,27 +2,20 @@
 {% load static %}
 {% block manage_payroll_js %}<script src ={% static "js/manage_payroll.js" %}> </script>{% endblock manage_payroll_js %}
 {% block content %}
-<div data-dial-init class="fixed right-6 bottom-6 group">
-    <div id="speed-dial-menu-square" class="flex flex-col items-center hidden mb-4 space-y-4 ">
-        <button type="button" class="flex justify-center items-center bg-blue-500 rounded-full p-3 shadow-custom relative hover:bg-green-500 hover:text-green-500">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14.5 5.5L18.5 9.5M3 21H7L20 8C20.5304 7.46956 20.8284 6.75014 20.8284 6C20.8284 5.24985 20.5304 4.53043 20 4C19.4696 3.46956 18.7501 3.17157 18 3.17157C17.2499 3.17157 16.5304 3.46956 16 4L3 17V21Z" stroke="#FCFCFC" stroke-opacity="0.760784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 8L7 3L3 7L8 12M7 8L5.5 9.5M16 12L21 17L17 21L12 16M16 17L14.5 18.5" stroke="#FFFFFF" stroke-opacity="0.760784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>            
-            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2 font-semibold">Working</span>
-        </button>
-        <button onclick="openCleansedDataModal()" type="button" class="flex justify-center items-center bg-blue-400 rounded-full p-3 shadow-custom relative hover:bg-green-400 hover:text-green-400">
+<div data-dial-init class="fixed right-6 bottom-6">
+    <div id="speed-dial-menu-square" class="flex flex-col items-center hidden mb-4 py-4 space-y-4 bg-blue-50 rounded-3xl shadow-custom">
+        <button onclick="openCleansedDataModal()" type="button" class="flex justify-center items-center bg-blue-400 rounded-full p-3 shadow-custom relative hover:bg-green-400 hover:text-green-500">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 3H5C4.46957 3 3.96086 3.21071 3.58579 3.58579C3.21071 3.96086 3 4.46957 3 5V9M9 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V9M9 3V21M3 9V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H9M3 9H21M21 9V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H9" stroke="#FFFFFF" stroke-opacity="0.760784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>            
-            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2 font-semibold">Excels</span>
+            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2  pr-1 font-bold">Excels</span>
         </button>
-        <button onclick="openImportModal()" type="button" class="flex justify-center items-center bg-blue-300 rounded-full p-3 shadow-custom relative hover:bg-green-300 hover:text-green-300">
+        <button onclick="openImportModal()" type="button" class="flex justify-center items-center bg-blue-300 rounded-full p-3 shadow-custom relative hover:bg-green-300 hover:text-green-500">
             <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12.44 14.75H3.75C3.34 14.75 3 14.41 3 14C3 13.59 3.34 13.25 3.75 13.25H12.44L10.72 11.53C10.43 11.24 10.43 10.76 10.72 10.47C11.01 10.18 11.49 10.18 11.78 10.47L14.78 13.47C14.85 13.54 14.9 13.62 14.94 13.71C15.02 13.89 15.02 14.1 14.94 14.28C14.9 14.37 14.85 14.45 14.78 14.52L11.78 17.52C11.63 17.67 11.44 17.74 11.25 17.74C11.06 17.74 10.87 17.67 10.72 17.52C10.5805 17.3789 10.5023 17.1884 10.5023 16.99C10.5023 16.7916 10.5805 16.6011 10.72 16.46L12.44 14.74V14.75ZM21 9.5V18C21 19.52 19.77 20.75 18.25 20.75H10.75C9.23 20.75 8 19.52 8 18V17C8 16.59 8.34 16.25 8.75 16.25C9.16 16.25 9.5 16.59 9.5 17V18C9.5 18.69 10.06 19.25 10.75 19.25H18.25C18.94 19.25 19.5 18.69 19.5 18V10.25H14.75C14.34 10.25 14 9.91 14 9.5V4.75H10.75C10.06 4.75 9.5 5.31 9.5 6V11C9.5 11.41 9.16 11.75 8.75 11.75C8.34 11.75 8 11.41 8 11V6C8 4.48 9.23 3.25 10.75 3.25H14.75C14.95 3.25 15.14 3.33 15.28 3.47L20.78 8.97C20.92 9.11 21 9.3 21 9.5ZM15.5 8.75H18.44L15.5 5.81V8.75Z" fill="#FFFFFF" fill-opacity="0.760784"/>
             </svg>                
-            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 mr-2 font-semibold">Import</span>
-        </button>
+            <span class="button-name absolute right-full top-1/2 transform -translate-y-1/2 p-1 font-bold" title="Import">Import</span>
+        </button>        
     </div>
 
     <button type="button" data-dial-toggle="speed-dial-menu-square" aria-controls="speed-dial-menu-default" aria-expanded="false" class="flex items-center justify-center text-white rounded-full w-14 h-14 transform transition duration-300 ease-in-out ">
@@ -70,7 +63,7 @@
                             <path d="M16 8.75C15.8019 8.74741 15.6126 8.66756 15.4725 8.52747C15.3324 8.38737 15.2526 8.19811 15.25 8V4.75H8.75V8C8.75 8.19891 8.67098 8.38968 8.53033 8.53033C8.38968 8.67098 8.19891 8.75 8 8.75C7.80109 8.75 7.61032 8.67098 7.46967 8.53033C7.32902 8.38968 7.25 8.19891 7.25 8V4.5C7.25 4.16848 7.3817 3.85054 7.61612 3.61612C7.85054 3.3817 8.16848 3.25 8.5 3.25H15.5C15.8315 3.25 16.1495 3.3817 16.3839 3.61612C16.6183 3.85054 16.75 4.16848 16.75 4.5V8C16.7474 8.19811 16.6676 8.38737 16.5275 8.52747C16.3874 8.66756 16.1981 8.74741 16 8.75ZM15.5 20.75H8.5C8.16848 20.75 7.85054 20.6183 7.61612 20.3839C7.3817 20.1495 7.25 19.8315 7.25 19.5V12.5C7.25 12.1685 7.3817 11.8505 7.61612 11.6161C7.85054 11.3817 8.16848 11.25 8.5 11.25H15.5C15.8315 11.25 16.1495 11.3817 16.3839 11.6161C16.6183 11.8505 16.75 12.1685 16.75 12.5V19.5C16.75 19.8315 16.6183 20.1495 16.3839 20.3839C16.1495 20.6183 15.8315 20.75 15.5 20.75ZM8.75 19.25H15.25V12.75H8.75V19.25Z" />  
                         </svg>
                     </button>                    
-                    <button class="bg-green-400 text-white text-xs p-2 rounded-md">
+                    <button class="bg-green-400 text-white text-xs p-2 rounded-md" onclick="openActivatePayslipModal('{{ user.username }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg" viewBox="0 0 24 24">
                             <path d="M17 19.22H5V7H12V5H5C3.9 5 3 5.9 3 7V19C3 20.1 3.9 21 5 21H17C18.1 21 19 20.1 19 19V12H17V19.22Z" />
                             <path d="M19 2H17V5H14C14.01 5.01 14 7 14 7H17V9.99C17.01 10 19 9.99 19 9.99V7H22V5H19V2ZM7 9H15V11H7V9ZM7 12V14H15V12H12H7ZM7 15H15V17H7V15Z" />
@@ -169,8 +162,32 @@
     </div>
 </div>
 
+<div id="salaryModal" class="modal">
+    <div class="modal-content">
+        <div class="receipt-header">
+            <h2>Salary Receipt</h2>
+            <p id="dateRange"></p>
+        </div>
+        <hr>
+        <div class="receipt-body">
+            <p><strong>Daily Salary:</strong>₱<span id="dailySalary"></span></p>
+            <p><strong>Full Day:</strong> <span id="fullAttendanceCount"></span></p>
+            <p><strong>Half Day:</strong> <span id="halfAttendanceCount"></span></p>
+            <p><strong>Absent:</strong> <span id="absentAttendanceCount"></span></p>
+            <hr>
+            <p><strong>Monthly Salary:</strong>₱<span id="monthlySalary"></span></p>
+        </div>
+        <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="closeSalaryModal()">Close</button>
+    </div>
+</div>
 
-<p id="dailySalary">Daily Salary: </p>
-<p id="monthlySalary">Monthly Salary: </p>
+<div id="activatePayslipModal" class="modal">
+    <div class="modal-content text-right">
+        <p class="mt-10 font-semibold">Are you sure you want to activate the payslip?</p>
+        <button onclick="closeActivatePayslipModal()" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mt-10">Cancel</button>
+        <button onclick="activatePayslip('{{ username }}')" class="bg-green-400 hover:bg-green-500 hover:text-white text-gray-200 font-bold py-2 px-8 rounded mt-10">Yes</button>
+    </div>
+</div>
 
+    
 {% endblock content %}

@@ -291,14 +291,25 @@ function saveNewUser() {
 }
 
 function showActiveSearch() {
-    document.getElementById('activeSearchForm').style.display = 'block';
-    document.getElementById('archiveSearchForm').style.display = 'none';
+    const activeSearchForm = document.getElementById('activeSearchForm');
+    const archiveSearchForm = document.getElementById('archiveSearchForm');
+
+    if (activeSearchForm && archiveSearchForm) {
+        activeSearchForm.style.display = 'block';
+        archiveSearchForm.style.display = 'none';
+    }
 }
 
 function showArchiveSearch() {
-    document.getElementById('archiveSearchForm').style.display = 'block';
-    document.getElementById('activeSearchForm').style.display = 'none';
+    const activeSearchForm = document.getElementById('activeSearchForm');
+    const archiveSearchForm = document.getElementById('archiveSearchForm');
+
+    if (activeSearchForm && archiveSearchForm) {
+        archiveSearchForm.style.display = 'block';
+        activeSearchForm.style.display = 'none';
+    }
 }
+
 
 function search() {
     const searchText = document.getElementById('simple-search').value.toLowerCase(); 
@@ -339,10 +350,27 @@ function searchArchive() {
     const errorMessageRow = document.getElementById('archivedResultsMessage');
     errorMessageRow.style.display = found ? 'none' : 'table-row';
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const simpleSearchInput = document.getElementById('simple-search');
+    const archiveSearchInput = document.getElementById('archive-search');
+    const activeButton = document.getElementById('activeButton');
+    const archiveButton = document.getElementById('archiveButton');
 
-document.getElementById('simple-search').addEventListener('input', search);
-document.getElementById('archive-search').addEventListener('input', searchArchive);
-document.getElementById('activeButton').addEventListener('click', showActiveSearch);
-document.getElementById('archiveButton').addEventListener('click', showArchiveSearch);
+    if (simpleSearchInput) {
+        simpleSearchInput.addEventListener('input', search);
+    }
 
-showActiveSearch();
+    if (archiveSearchInput) {
+        archiveSearchInput.addEventListener('input', searchArchive);
+    }
+
+    if (activeButton) {
+        activeButton.addEventListener('click', showActiveSearch);
+    }
+
+    if (archiveButton) {
+        archiveButton.addEventListener('click', showArchiveSearch);
+    }
+
+    showActiveSearch();
+});
