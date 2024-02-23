@@ -91,3 +91,4 @@
     document.getElementById('nextMonth').addEventListener('click', () => {
         updateMonth('next');
     });
+

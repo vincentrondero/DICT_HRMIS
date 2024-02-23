@@ -226,3 +226,22 @@ function activatePayslip() {
         }
     });
 }
+function downloadPdf() {
+    // Show the PDF content section
+    $('#pdfContent').show();
+
+    // Capture the PDF content
+    const element = document.getElementById('pdfContent');
+
+    // Use html2pdf to generate the PDF
+    html2pdf(element, {
+        margin: 5,
+        filename: 'salary_receipt.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: [160, 105], orientation: 'portrait' },
+        onAfterPdf: function (pdf) {
+            $('#pdfContent').hide();
+        }
+    });
+}

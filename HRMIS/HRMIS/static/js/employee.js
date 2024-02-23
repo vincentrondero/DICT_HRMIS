@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
         openModalBtn.addEventListener('click', openUploadModal);
     }
 });
+
 function openPayrollModal() {
 
     $.ajax({
@@ -73,49 +74,12 @@ function openPayrollModal() {
                 // Assuming you have a function to populate the modal
                 populatePayrollModal(data.payrolls);
             } else {
-                // Show the "NO DATA FOUND" modal
+                
                 showNoDataModal();
             }
         },        
         error: function(error) {
             // Handle the error case
-            console.error('Error fetching activated payslips:', error);
-            alert('Error fetching activated payslips. Please try again.');
-        }
-    });
-}
-
-
-function populatePayrollModal(payrolls) {
-    var modal = $('#payrollModal');
-    var payrollDetailsContainer = $('#payrollDetailsContainer');
-
-    payrollDetailsContainer.empty();
-
-    payrolls.forEach(function (payroll) {
-        var payrollCard = $('<div>').addClass('payroll-card bg-white p-4 rounded-b-md shadow-md border-t-8 border-green-500');
-        payrollCard.append($('<p>').addClass('font-bold').text('User: ' + payroll.user));
-        payrollCard.append($('<p>').text('Monthly Salary: ' + payroll.monthly_salary));
-        payrollCard.append($('<p>').text('Full Attendance Count: ' + payroll.full_attendance_count));
-        payrollCard.append($('<p>').text('Half Attendance Count: ' + payroll.half_attendance_count));
-        payrollCard.append($('<p>').text('Absent Attendance Count: ' + payroll.absent_attendance_count));
-        payrollCard.append($('<p>').text('Date Range: ' + payroll.date_range));
-        payrollCard.append($('<p>').text('Activated Date: ' + payroll.activated_date));
-        payrollDetailsContainer.append(payrollCard);
-    });
-
-    modal.show();
-}
-
-function openPayrollModal() {
-    $.ajax({
-        url: '/employee_views/activated_payslip/',
-        method: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            populatePayrollModal(data.payrolls);
-        },        
-        error: function(error) {
             console.error('Error fetching activated payslips:', error);
             alert('Error fetching activated payslips. Please try again.');
         }
