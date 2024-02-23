@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from .forms import UserEditForm, UserCreationForm
 from Authentication.models import User
+from .models import CleansedData, Attendance, Payslip
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.shortcuts import get_object_or_404
@@ -10,14 +11,18 @@ import pandas as pd
 import numpy as np
 from .models import CleansedData
 from django.db.models import Min, Max
-
+from django.utils.decorators import method_decorator
+from django.views import View
+from datetime import datetime
+import math
 
 
 def dashboard_views(request, user_role):
     user_role = request.session.get('role', 'Guest')
-    users = User.objects.all().count()
+    users = User.objects.filter(role='JO').count()
     active_users = User.objects.filter(role='JO', archived=False).count()
-    return render(request, 'HR/dashboard.html', {'user_role': user_role, 'users': users, 'active_users': active_users})
+    archive_users = User.objects.filter(role='JO', archived=True).count()
+    return render(request, 'HR/dashboard.html', {'user_role': user_role, 'users': users, 'active_users': active_users, 'archive_users':archive_users})
 
 from django.db.models import Max
 def manage_payroll(request, user_role):
@@ -281,12 +286,6 @@ def view_excel_content(request, cleansed_data_id):
 
     return HttpResponse(html_content)
 
-from django.utils.decorators import method_decorator
-from django.views import View
-from .models import CleansedData, User, Attendance
-from datetime import datetime
-import math
-
 
 class SaveAttendanceView(View):
     @method_decorator(csrf_exempt)
@@ -396,10 +395,6 @@ class SaveAttendanceView(View):
 
 
 
-# views.py
-from django.http import JsonResponse
-from .models import Attendance
-
 def get_latest_attendance(request, username):
     user = User.objects.get(username=username)
     print(f"Received username: {username}")
@@ -417,9 +412,6 @@ def get_latest_attendance(request, username):
         attendance_data.append(data)
 
     return JsonResponse({'attendances': attendance_data})
-
-from django.shortcuts import get_object_or_404
-
 
 def calculate_salary(request, username):
     if request.method == 'GET':
@@ -501,11 +493,6 @@ def calculate_salary(request, username):
             return JsonResponse({'error': 'Invalid salary grade'})
     else:
         return JsonResponse({'error': 'Invalid request method'})
-
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from .models import User, Payslip
-import json
 
 def activate_payslip(request, username):
     print('Request method:', request.method)

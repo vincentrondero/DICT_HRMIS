@@ -3,22 +3,22 @@
 {% block manage_payroll_js %}<script src ={% static "js/manage_payroll.js" %}> </script>{% endblock manage_payroll_js %}
 {% block content %}
 <div data-dial-init class="fixed right-6 bottom-6">
-    <div id="speed-dial-menu-square" class="flex flex-col items-center hidden mb-4 py-4 space-y-4">
-        <button onclick="openCleansedDataModal()" type="button" class="flex flex-col items-center bg-blue-400 rounded-full py-2 px-3 shadow-custom hover:bg-green-400 hover:shadow-2xl hover:ring-2 hover:ring-blue-500 transition duration-300 ease-in-out">
-            <svg class="w-7 h-7 mx-auto" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <div id="speed-dial-menu-square" class="flex flex-col items-center hidden mb-4 py-4 space-y-4 bg-gray-100 rounded-xl bg-opacity-60">
+        <button onclick="openCleansedDataModal()" type="button" class="flex flex-col items-center bg-blue-400 rounded-2xl px-3 py-2 shadow-custom hover:bg-green-400 hover:shadow-2xl  transition duration-300 ease-in-out">
+            <svg class="w-7 h-7 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <path d="M9 3H5C4.46957 3 3.96086 3.21071 3.58579 3.96086C3.21071 3.96086 3 4.46957 3 5V9M9 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V9M9 3V21M3 9V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H9M3 9H21M21 9V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H9" stroke="#FFFFFF" stroke-opacity="0.760784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <span class="block mb-px text-xs font-medium text-white">Excels</span>
           </button>          
-        <button onclick="openImportModal()" type="button" class="flex flex-col items-center bg-blue-400 rounded-full px-3 py-2 shadow-custom hover:bg-green-400">
-            <svg class="w-7 h-7 mx-auto" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <button onclick="openImportModal()" type="button" class="flex flex-col items-center bg-blue-400 rounded-2xl px-3 py-2 shadow-custom hover:bg-green-400  hover:shadow-2xl  transition duration-300 ease-in-out">
+            <svg class="w-7 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <path d="M12.44 14.75H3.75C3.34 14.75 3 14.41 3 14C3 13.59 3.34 13.25 3.75 13.25H12.44L10.72 11.53C10.43 11.24 10.43 10.76 10.72 10.47C11.01 10.18 11.49 10.18 11.78 10.47L14.78 13.47C14.85 13.54 14.9 13.62 14.94 13.71C15.02 13.89 15.02 14.1 14.94 14.28C14.9 14.37 14.85 14.45 14.78 14.52L11.78 17.52C11.63 17.67 11.44 17.74 11.25 17.74C11.06 17.74 10.87 17.67 10.72 17.52C10.5805 17.3789 10.5023 17.1884 10.5023 16.99C10.5023 16.7916 10.5805 16.6011 10.72 16.46L12.44 14.74V14.75ZM21 9.5V18C21 19.52 19.77 20.75 18.25 20.75H10.75C9.23 20.75 8 19.52 8 18V17C8 16.59 8.34 16.25 8.75 16.25C9.16 16.25 9.5 16.59 9.5 17V18C9.5 18.69 10.06 19.25 10.75 19.25H18.25C18.94 19.25 19.5 18.69 19.5 18V10.25H14.75C14.34 10.25 14 9.91 14 9.5V4.75H10.75C10.06 4.75 9.5 5.31 9.5 6V11C9.5 11.41 9.16 11.75 8.75 11.75C8.34 11.75 8 11.41 8 11V6C8 4.48 9.23 3.25 10.75 3.25H14.75C14.95 3.25 15.14 3.33 15.28 3.47L20.78 8.97C20.92 9.11 21 9.3 21 9.5ZM15.5 8.75H18.44L15.5 5.81V8.75Z" fill="#FFFFFF" fill-opacity="0.760784"/>
             </svg>
             <span class="block mb-px text-xs font-medium text-white">Import</span>
         </button>
     </div>
 
-    <button type="button" data-dial-toggle="speed-dial-menu-square" aria-controls="speed-dial-menu-default" aria-expanded="false" class="flex items-center justify-center text-white rounded-full w-16 h-16 transform transition duration-300 ease-in-out">
+    <button type="button" data-dial-toggle="speed-dial-menu-square" aria-controls="speed-dial-menu-default" aria-expanded="false" class="flex items-center justify-center text-white rounded-2xl w-16 h-16 transform transition duration-300 ease-in-out shadow-xl">
         <svg class="w-4 h-4 transition-transform group-hover:rotate-45" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
         </svg>
@@ -153,7 +153,7 @@
             </div>
             <div class="modal-footer flex justify-end">
                 <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mr-2" onclick="closeAttendanceModal()">Close</button>
-                <button type="button" class="bg-green-300 hover:bg-green-500 text-gray-50 font-semibold hover:text-white py-2 px-4 rounded mr-2" onclick="closeAttendanceModal()">Add</button>
+                <button type="button" class="bg-green-300 hover:bg-green-500 text-gray-50 font-semibold hover:text-white py-2 px-4 rounded mr-2" onclick="closeAttendanceModal()">Add Attendance</button>
             </div>
         </div>
     </div>
@@ -223,8 +223,9 @@
             </div>
         </div>
     </div>
-    <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded float-right mt-4" onclick="closeSalaryModal()">Close</button>
-        <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded float-right mt-4 mr-2" onclick="downloadPdf()">Download PDF</button>
+    <div  class="flex justify-end space-x-2" > 
+        <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mt-4" onclick="closeSalaryModal()">Close</button>
+        <button type="button" class="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4  rounded mt-4 mr-2" onclick="downloadPdf()">Download PDF</button>
     </div>
 </div>
 
