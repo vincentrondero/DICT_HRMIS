@@ -425,7 +425,7 @@ def calculate_salary(request, username):
     if request.method == 'GET':
         # Your logic to fetch the user's salary grade
         user = get_object_or_404(User, username=username)
-
+        user_name = user.name
         salary_grades = {
             '1': 626.3636,
             '2': 662.6364,
@@ -495,6 +495,7 @@ def calculate_salary(request, username):
                 'half_attendance_count': half_attendance_count,
                 'absent_attendance_count': absent_attendance_count,
                 'date_range': date_range,
+                'employee_name': user_name,
             })
         else:
             return JsonResponse({'error': 'Invalid salary grade'})
@@ -504,32 +505,22 @@ def calculate_salary(request, username):
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from .models import User, Payslip
-from .views import calculate_salary
 import json
 
 def activate_payslip(request, username):
     print('Request method:', request.method)
-    if request.method == 'POST' or request.method == 'GET':
-        # Call the calculate_salary function to get the necessary data
-        salary_data = calculate_salary(request, username)
 
-        # Extract the JSON data from the response
-        salary_data_json = json.loads(salary_data.content.decode('utf-8'))
-
-        # Print the response from calculate_salary for debugging
-        print('Salary Data:', salary_data_json)
-
-        # Check if there is an error in the response from calculate_salary
-        if 'error' in salary_data_json:
-            return JsonResponse({'error': salary_data_json['error']})
-
+    if request.method == 'POST':
         try:
-            # Extract the data from the response
-            monthly_salary = salary_data_json['monthly_salary']
-            full_attendance_count = salary_data_json['full_attendance_count']
-            half_attendance_count = salary_data_json['half_attendance_count']
-            absent_attendance_count = salary_data_json['absent_attendance_count']
-            date_range = salary_data_json['date_range']
+            # Extract the JSON data from the request body
+            salary_data = json.loads(request.body.decode('utf-8'))
+
+            # Extract the data from the JSON data
+            monthly_salary = salary_data.get('monthly_salary')
+            full_attendance_count = salary_data.get('full_attendance_count')
+            half_attendance_count = salary_data.get('half_attendance_count')
+            absent_attendance_count = salary_data.get('absent_attendance_count')
+            date_range = salary_data.get('date_range')
 
             # Get the user object
             user = get_object_or_404(User, username=username)
@@ -546,9 +537,8 @@ def activate_payslip(request, username):
             )
 
             return JsonResponse({'success': 'Payslip activated successfully'})
-        except KeyError as e:
-            # Handle the missing key in the response
-            return JsonResponse({'error': f'Missing key in salary data: {e}'})
+        except Exception as e:
+            # Handle any exceptions or errors during the creation
+            return JsonResponse({'error': f'Error activating payslip: {e}'})
     else:
         return JsonResponse({'error': 'Invalid request method'})
-

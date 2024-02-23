@@ -40,5 +40,11 @@ def login_user(request):
 
     return render(request, 'Authentication/Login.html', {'user_role': user_role})
 
+from Payroll.models import Payslip
+
+def payroll_view(request):
+    user = request.user
+    active_payslip = Payslip.objects.filter(user=user, activated=True).first()
+    return render(request, 'payroll_template.html', {'active_payslip': active_payslip})
 
 

@@ -118,6 +118,9 @@ function showUserAttendance(username) {
                             <td class="px-4 py-2">${attendance.time_in}</td>
                             <td class="px-4 py-2">${attendance.time_out}</td>
                             <td class="px-4 py-2">${attendance.remark}</td>
+                            <td class="px-4 py-2">
+                            <button type="button" class="bg-red-100 hover:bg-yellow-500 text-yellow-500 font-semibold hover:text-white py-2 px-4 border border-yellow-500 hover:border-transparent rounded mr-2" onclick="editAttendance()">Edit</button>
+                            </td>
                         </tr>`;
                     tableBody.append(rowHtml);
                 });
@@ -151,6 +154,8 @@ function calculateSalary(username) {
             $('#absentAttendanceCount').text(data.absent_attendance_count);
             $('#monthlySalary').text(data.monthly_salary);
             $('#dateRange').text(data.date_range);
+            $('#employeeName').text(data.employee_name);
+            $('#employeeId').text(username);
             // Show the modal
             $('#salaryModal').show();
         },
@@ -187,29 +192,20 @@ function activatePayslip() {
     var username = $('#activatePayslipModal').data('username');
     var csrftoken = getCookie('csrftoken');
 
-    // Use the correct HTTP method (GET) for calculate_salary endpoint
+    // Make a GET request to calculate_salary endpoint
     $.ajax({
         url: `/hr_views/calculate_salary/${username}/`,
-        method: 'GET',  // Keep it as GET
+        method: 'GET',
         dataType: 'json',
         success: function(data) {
             console.log('calculate_salary response:', data);
-
-            // Adjust the data format for the POST request
-            var postData = {
-                daily_salary: data.daily_salary,
-                monthly_salary: data.monthly_salary,
-                full_attendance_count: data.full_attendance_count,
-                half_attendance_count: data.half_attendance_count,
-                absent_attendance_count: data.absent_attendance_count,
-                date_range: data.date_range
-            };
 
             // Use the returned data as the payload for the activate_payslip endpoint
             $.ajax({
                 url: `/hr_views/activate_payslip/${username}/`,
                 method: 'POST',
-                data: postData,  // Send the adjusted data
+                data: JSON.stringify(data),  // Send the data as JSON string
+                contentType: 'application/json',  // Specify the content type
                 dataType: 'json',
                 headers: {
                     'X-CSRFToken': csrftoken
@@ -230,4 +226,3 @@ function activatePayslip() {
         }
     });
 }
-

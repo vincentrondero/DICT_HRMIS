@@ -22,10 +22,12 @@
   {% endif %}
 
 
-<main class="{% if user_role != 'JO' %}ml-60{% endif %} pt-2 max-h-screen overflow-auto">
+  <main class="{% if user_role != 'JO' %}ml-60{% endif %} pt-2 max-h-screen overflow-auto" style="scrollbar-width: none; scrollbar-color: transparent transparent;">
     {% block content %}
-    {% endblock%}
+    {% endblock %}
   </main>
+  
+  
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
 <script src ={% static "js/main.js" %}> </script>

@@ -21,9 +21,15 @@ class UserCreationForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super(UserCreationForm, self).save(commit=False)
-        user.archived = False 
+
+        # Ensure the password is hashed before saving
+        user.password = make_password(self.cleaned_data['password'])
+
+        user.archived = False
+
         if commit:
             user.save()
+
         return user
 
 
