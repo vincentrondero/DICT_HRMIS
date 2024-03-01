@@ -147,15 +147,30 @@ function calculateSalary(username) {
         method: 'GET',
         dataType: 'json',
         success: function(data) {
+            console.log(data);
             // Update the modal content with the calculated values
             $('#dailySalary').text(data.daily_salary);
+            $('#basic_salary').text(data.basic_salary);
+            $('#premium').text(data.premium);
+            $('#another_gross_pay').text(data.gross_pay);
+            $('#gross_pay').text(data.gross_pay);
             $('#fullAttendanceCount').text(data.full_attendance_count);
             $('#halfAttendanceCount').text(data.half_attendance_count);
-            $('#absentAttendanceCount').text(data.absent_attendance_count);
-            $('#monthlySalary').text(data.monthly_salary);
+            $('#absentAttendanceCount').text(data.absent_count);
             $('#dateRange').text(data.date_range);
-            $('#employeeName').text(data.employee_name);
-            $('#employeeId').text(username);
+            $('#employeeName').text(data.name);
+            $('#employeeId').text(username);late_count
+            $('#late_count').text(data.late_attendance_count);
+            $('#late_deduction').text(data.late_deduction);
+            $('#absent_deduction').text(data.absent_deduction);
+            $('#pre_deduction').text(data.pre_deduction);
+            $('#total_deduction').text(data.total_deduction);
+            $('#net_before_tax').text(data.net_before_tax)
+            $('#2_percent').text(data.tax_2_percent);
+            $('#3_percent').text(data.tax_3_percent);
+            $('#number_of_days').text(data.number_of_days);
+            $('#total_net_pay').text(data.total_net_pay);
+            $('#current_date').text(data.current_date);
             // Show the modal
             $('#salaryModal').show();
         },
@@ -191,7 +206,7 @@ function closeActivatePayslipModal() {
 function activatePayslip() {
     var username = $('#activatePayslipModal').data('username');
     var csrftoken = getCookie('csrftoken');
-
+    console.log('clicked')
     // Make a GET request to calculate_salary endpoint
     $.ajax({
         url: `/hr_views/calculate_salary/${username}/`,
@@ -239,7 +254,7 @@ function downloadPdf() {
         filename: 'salary_receipt.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: [160, 105], orientation: 'portrait' },
+        jsPDF: { unit: 'mm', format: [162, 125], orientation: 'portrait' },
         onAfterPdf: function (pdf) {
             $('#pdfContent').hide();
         }

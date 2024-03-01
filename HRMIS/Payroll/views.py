@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from .forms import UserEditForm, UserCreationForm
 from Authentication.models import User
-from .models import CleansedData, Attendance, Payslip
+from .models import CleansedData, Attendance, Payslip, SalaryGrade
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.shortcuts import get_object_or_404
@@ -19,10 +19,42 @@ import math
 
 def dashboard_views(request, user_role):
     user_role = request.session.get('role', 'Guest')
+    
     users = User.objects.filter(role='JO').count()
     active_users = User.objects.filter(role='JO', archived=False).count()
     archive_users = User.objects.filter(role='JO', archived=True).count()
-    return render(request, 'HR/dashboard.html', {'user_role': user_role, 'users': users, 'active_users': active_users, 'archive_users':archive_users})
+    
+    attendance_count = Attendance.objects.all().count()
+    full_day_attendance_count = Attendance.objects.filter(remark='FULL').count()
+    late_attendance_count = Attendance.objects.filter(remark='LATE').count()
+    absent_attendance_count = Attendance.objects.filter(remark='ABSENT').count()
+
+    percentage_full_attendance = 0
+    percentage_late_attendance = 0
+    percentage_absent_attendance = 0
+
+    if attendance_count > 0:
+        percentage_full_attendance = round(((full_day_attendance_count / attendance_count) * 100))
+        percentage_late_attendance = round(((late_attendance_count / attendance_count) * 100))
+        percentage_absent_attendance =round(( (absent_attendance_count / attendance_count) * 100))
+
+    context = {
+        'user_role': user_role,
+        'users': users,
+        'active_users': active_users,
+        'archive_users': archive_users,
+        'attendance_count': attendance_count,
+        'full_day_attendance_count': full_day_attendance_count,
+        'late_attendance_count': late_attendance_count,
+        'absent_attendance_count': absent_attendance_count,
+        'percentage_full_attendance': percentage_full_attendance,
+        'percentage_late_attendance': percentage_late_attendance,
+        'percentage_absent_attendance': percentage_absent_attendance,
+    }
+
+    return render(request, 'HR/dashboard.html', context)
+
+
 
 from django.db.models import Max
 def manage_payroll(request, user_role):
@@ -293,9 +325,12 @@ class SaveAttendanceView(View):
         return super().dispatch(*args, **kwargs)
 
     def calculate_remark(self, time_in, time_out, date):
+        minutes_late = 0 
         if pd.isna(time_in) or pd.isna(time_out):
             # Treat as half day if either time entry is NaN
-            return 'HALF'
+            return 'HALF', 0
+        elif not time_in or not time_out:
+            return 'ABSENT', 0
         else:
             # Convert time_in and time_out to datetime.time objects with format %H:%M
             time_in = datetime.strptime(str(time_in), "%H:%M").time()
@@ -306,14 +341,33 @@ class SaveAttendanceView(View):
 
             # Classify based on the criteria
             if hours_worked >= 8:
-                return 'FULL'
+                if date.weekday() == 0:  # Monday
+                    if time_in > datetime.strptime("08:00", "%H:%M").time():
+                        minutes_late = (time_in.hour - 8) * 60 + time_in.minute
+                        return 'LATE', minutes_late
+                elif 1 <= date.weekday() <= 4:  # Tuesday to Friday
+                    if time_in > datetime.strptime("09:00", "%H:%M").time():
+                        minutes_late = (time_in.hour - 9) * 60 + time_in.minute
+                        return 'LATE', minutes_late
+                return 'FULL', 0
             elif 4 <= hours_worked < 8:
-                return 'HALF'
+                if date.weekday() == 0:  # Monday
+                    if time_in > datetime.strptime("12:00", "%H:%M").time():
+                        minutes_late = (time_in.hour - 12) * 60 + time_in.minute
+                        return 'LATE', minutes_late
+                elif 1 <= date.weekday() <= 4:  # Tuesday to Friday
+                    if time_in > datetime.strptime("12:00", "%H:%M").time():
+                        minutes_late = (time_in.hour - 12) * 60 + time_in.minute
+                        return 'LATE', minutes_late
+                return 'HALF', 0
             else:
-                return 'ABSENT'
+                return 'ABSENT', 0
+
+
 
     def post(self, request, *args, **kwargs):
         try:
+            # Get cleansed data ID from the request
             cleansed_data_id = int(request.POST.get('cleansedDataId'))
             cleansed_data = CleansedData.objects.get(id=cleansed_data_id)
 
@@ -329,6 +383,12 @@ class SaveAttendanceView(View):
             # Iterate through rows using iterrows
             for index, row in df.iterrows():
                 employee_id = int(row['No'])
+
+                # Check if the employee_id exists in the User model
+                user = User.objects.filter(username=str(employee_id)).first()
+                if not user:
+                    print(f"Skipping row {index + 2} (Employee ID {employee_id}): No matching user found")
+                    continue
 
                 filename_parts = cleansed_data.file_name.split('_')
                 month_str = filename_parts[1].capitalize()
@@ -356,42 +416,38 @@ class SaveAttendanceView(View):
                         if pd.isna(time_out):
                             time_out = ''
 
-                        # Skip rows where both time entries are empty
-                        if not time_in and not time_out:
-                            print(f"Skipping row {index + 2} (Employee ID {employee_id}): Both time entries are empty")
-                            continue
-
-                        # Skip rows where one of the time entries is missing
-                        if not time_in or not time_out:
-                            print(f"Skipping row {index + 2} (Employee ID {employee_id}): Incomplete time entries")
+                        # Check if both time entries are empty and it's a weekend
+                        if not time_in and not time_out and date.weekday() >= 5:
+                            print(f"Skipping row {index + 2} (Employee ID {employee_id}): Both time entries are empty, but it's a weekend")
                             continue
 
                         print(f"Processing row {index + 2} (Employee ID {employee_id}), Date: {date}, Time In: {time_in}, Time Out: {time_out}")
 
                         # Calculate the remark based on time_in, time_out, and date
-                        remark = self.calculate_remark(time_in, time_out, date)
+                        remark, minutes_late = self.calculate_remark(time_in, time_out, date)
 
-                        # Check if an attendance record already exists for the employee and date
-                        existing_attendance = Attendance.objects.filter(employee_id=employee_id, date=date).first()
+                        # Check if an attendance record already exists for the user and date
+                        existing_attendance = Attendance.objects.filter(employee=user, date=date).first()
 
                         if existing_attendance:
                             print(f"Attendance record already exists for Employee ID {employee_id}, Date: {date}")
                         else:
                             # Creating the Attendance record
                             Attendance.objects.create(
-                                employee_id=employee_id,
+                                employee=user,
                                 date=date,
-                                time_in=time_in,
-                                time_out=time_out,
+                                time_in=time_in if time_in else None,
+                                time_out=time_out if time_out else None,
                                 excel_file=cleansed_data,
-                                remark=remark
+                                remark=remark,
+                                minutes_late=minutes_late
                             )
-            else:
-                print("No relevant columns found.")
 
             return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
+
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)})
+
 
 
 
@@ -413,86 +469,100 @@ def get_latest_attendance(request, username):
 
     return JsonResponse({'attendances': attendance_data})
 
+from django.db.models import Sum
+
 def calculate_salary(request, username):
     if request.method == 'GET':
-        # Your logic to fetch the user's salary grade
         user = get_object_or_404(User, username=username)
         user_name = user.name
-        salary_grades = {
-            '1': 626.3636,
-            '2': 662.6364,
-            '3': 703.9091,
-            '4': 747.4091,
-            '5': 793.3182,
-            '6': 842.7273,
-            '7': 893.8182,
-            '8': 957.6818,
-            '9': 1018.9091,
-            '10': 1117.5909,
-            '11': 1321.5909,
-            '12': 1423.1818,
-            '13': 1527.7727,
-            '14': 1652.7727,
-            '15': 1789.4091,
-            '16': 1941.5455,
-            '17': 2107.0455,
-            '18': 2290.0909,
-            '19': 2581.3636,
-            '20': 2884.7727,
-            '21': 3223.3182,
-            '22': 3606.7727,
-            '23': 4058.2273,
-            '24': 4585.8182,
-            '25': 5227.8182,
-            '26': 5871.0909,
-            '27': 6675.4091,
-            '28': 7542.3182,
-            '29': 8523.8636,
-            '30': 9631.9091,
-            '31': 14490.2727,
-            '32': 17352.1818,
-            '33': 20829.8182,
-        }
 
-        # Convert the user's salary grade to a string
+        salary_grades = {str(grade.grade): grade.salary for grade in SalaryGrade.objects.all()}
+
         user_salary_grade_str = str(user.salary_grade)
 
-        # Check if the user's salary grade is in the predefined grades
         if user_salary_grade_str in salary_grades:
-            # Get the daily salary based on the user's salary grade
             daily_salary = salary_grades[user_salary_grade_str]
+          # Fetch all attendance entries for the user based on the last generated date
+            last_generated_date = user.attendance_set.latest('generated_date').generated_date
+            all_attendances = Attendance.objects.filter(employee=user, generated_date__date=last_generated_date.date())
 
-            # Fetch all attendance entries for the user
-            all_attendances = Attendance.objects.filter(
-                employee=user
-            )
+            # Calculate the number of days in the date range
+            number_of_days = all_attendances.count()
+
             min_date = all_attendances.aggregate(Min('date'))['date__min']
             max_date = all_attendances.aggregate(Max('date'))['date__max']
+
             date_range = f"{min_date.strftime('%B %d, %Y')} - {max_date.strftime('%B %d, %Y')}"
 
-            # Count the number of remarks where attendance is "FULL", "HALF", or "ABSENT"
             full_attendance_count = all_attendances.filter(remark='FULL').count()
             half_attendance_count = all_attendances.filter(remark='HALF').count()
             absent_attendance_count = all_attendances.filter(remark='ABSENT').count()
+            late_attendance_count = all_attendances.filter(remark='LATE').count()
 
-            # Calculate the monthly salary
             full_day_salary = daily_salary * full_attendance_count
-            half_day_salary = (daily_salary * half_attendance_count)/2
+            half_day_salary = (daily_salary * half_attendance_count) / 2
             monthly_salary = full_day_salary + half_day_salary
 
+            # Calculate late deduction
+            total_late_minutes = all_attendances.aggregate(Sum('minutes_late'))['minutes_late__sum']
+            late_deduction = round((daily_salary / 22) / 480 * total_late_minutes, 2)
+
+
+            # Calculate absent deduction
+            absent_deduction = round((daily_salary / 22) * absent_attendance_count, 2)
+
+            #Calculate absent + late deduction
+            pre_deduction = round(( absent_deduction + late_deduction),2)
+
+            # Calculate basic salary and premium
+            basic_salary = round(monthly_salary,4)
+            premium =round( (0.2 * basic_salary ) , 4) 
+
+            # Calculate gross pay
+            gross_pay = basic_salary + premium
+
+            # Calculate net before tax
+            net_before_tax = gross_pay - (late_deduction + absent_deduction)
+
+            # Calculate tax
+            tax_2_percent =round(( 0.02 * net_before_tax),2)
+            tax_3_percent =round(( 0.03 * net_before_tax),2)
+
+            # Calculate total deduction
+            total_deduction = round( late_deduction + absent_deduction + tax_2_percent + tax_3_percent,4)
+
+            # Calculate total net pay
+            total_net_pay =round( gross_pay - total_deduction, 4)
+
+            current_date = datetime.now().date()
+
             return JsonResponse({
+                'username': username,
+                'name': user_name,
+                'basic_salary': basic_salary,
+                'premium': premium,
+                'gross_pay': gross_pay,
                 'daily_salary': daily_salary,
-                'monthly_salary': monthly_salary,
-                'full_attendance_count': full_attendance_count,
-                'half_attendance_count': half_attendance_count,
-                'absent_attendance_count': absent_attendance_count,
+                'total_late_minutes': total_late_minutes,
+                'late_attendance_count':late_attendance_count,
+                'late_deduction': late_deduction,
+                'absent_count': absent_attendance_count,
+                'absent_deduction': absent_deduction,
+                'pre_deduction': pre_deduction,
+                'total_deduction': total_deduction,
+                'net_before_tax': net_before_tax,
+                'tax_2_percent': tax_2_percent,
+                'tax_3_percent': tax_3_percent,
+                'number_of_days': number_of_days,
                 'date_range': date_range,
-                'employee_name': user_name,
+                'total_net_pay': total_net_pay,
+                'current_date':current_date,
             })
         else:
             return JsonResponse({'error': 'Invalid salary grade'})
     else:
         return JsonResponse({'error': 'Invalid request method'})
+
 
 def activate_payslip(request, username):
     print('Request method:', request.method)
@@ -503,11 +573,24 @@ def activate_payslip(request, username):
             salary_data = json.loads(request.body.decode('utf-8'))
 
             # Extract the data from the JSON data
-            monthly_salary = salary_data.get('monthly_salary')
-            full_attendance_count = salary_data.get('full_attendance_count')
-            half_attendance_count = salary_data.get('half_attendance_count')
-            absent_attendance_count = salary_data.get('absent_attendance_count')
+            basic_salary = salary_data.get('basic_salary')
+            premium = salary_data.get('premium')
+            gross_pay = salary_data.get('gross_pay')
+            daily_salary = salary_data.get('daily_salary')
+            total_late_minutes = salary_data.get('total_late_minutes')
+            late_attendance_count = salary_data.get('late_attendance_count')
+            late_deduction = salary_data.get('late_deduction')
+            absent_count = salary_data.get('absent_count')
+            absent_deduction = salary_data.get('absent_deduction')
+            pre_deduction = salary_data.get('pre_deduction')
+            total_deduction = salary_data.get('total_deduction')
+            net_before_tax = salary_data.get('net_before_tax')
+            tax_2_percent = salary_data.get('tax_2_percent')
+            tax_3_percent = salary_data.get('tax_3_percent')
+            number_of_days = salary_data.get('number_of_days')
             date_range = salary_data.get('date_range')
+            total_net_pay = salary_data.get('total_net_pay')
+            current_date = salary_data.get('current_date')
 
             # Get the user object
             user = get_object_or_404(User, username=username)
@@ -515,11 +598,24 @@ def activate_payslip(request, username):
             # Create and save the Payslip instance
             payslip = Payslip.objects.create(
                 user=user,
-                monthly_salary=monthly_salary,
-                full_attendance_count=full_attendance_count,
-                half_attendance_count=half_attendance_count,
-                absent_attendance_count=absent_attendance_count,
+                basic_salary=basic_salary,
+                premium=premium,
+                gross_pay=gross_pay,
+                daily_salary=daily_salary,
+                total_late_minutes=total_late_minutes,
+                late_attendance_count=late_attendance_count,
+                late_deduction=late_deduction,
+                absent_count=absent_count,
+                absent_deduction=absent_deduction,
+                pre_deduction=pre_deduction,
+                total_deduction=total_deduction,
+                net_before_tax=net_before_tax,
+                tax_2_percent=tax_2_percent,
+                tax_3_percent=tax_3_percent,
+                number_of_days=number_of_days,
                 date_range=date_range,
+                total_net_pay=total_net_pay,
+                current_date=current_date,
                 activated=True
             )
 

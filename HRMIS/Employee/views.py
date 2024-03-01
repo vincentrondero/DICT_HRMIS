@@ -19,13 +19,14 @@ def employee_dashboard(request, user_role):
         if user_profile and user_profile.profile_picture:
             user_profile.profile_picture = base64.b64encode(user_profile.profile_picture).decode('utf-8')
 
+        user_payslips = Payslip.objects.filter(user=user, activated=True)
+
     except User.DoesNotExist:
         user_name = 'Guest'
         user_profile = None
-        activated_payslip = None
+        user_payslips = None
 
-    return render(request, 'Employee/Employee.html', {'user_name': user_name, 'user_role': user_role, 'user': user, 'user_profile': user_profile,})
-
+    return render(request, 'Employee/Employee.html', {'user_name': user_name, 'user_role': user_role, 'user': user, 'user_profile': user_profile, 'user_payslips': user_payslips})
 
 @csrf_exempt
 def profile_view(request):
@@ -43,47 +44,3 @@ def profile_view(request):
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-
-def get_activated_payslip(user_id):
-    user = get_object_or_404(User, USER_pkID=user_id)
-    
-    # Fetch all activated payslips for the user
-    activated_payslips = Payslip.objects.filter(user=user, activated=True)
-
-    return activated_payslips
-
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-
-def activated_payslip(request):
-    # Get user_id from the session
-    user_id = request.session.get('user_id')
-
-    # Fetch all activated payslips for the logged-in user
-    activated_payslips = get_activated_payslip(user_id)
-
-    if activated_payslips:
-    # Customize the data you want to include in the response
-        response_data = {
-            'payrolls': [{
-                'user': payslip.user.username,
-                'monthly_salary': payslip.monthly_salary,
-                'full_attendance_count': payslip.full_attendance_count,
-                'half_attendance_count': payslip.half_attendance_count,
-                'absent_attendance_count': payslip.absent_attendance_count,
-                'date_range': payslip.date_range,
-                'activated_date': payslip.activated_date.strftime('%Y-%m-%d'),
-                'activated': payslip.activated,
-            } for payslip in activated_payslips]
-        }
-        return JsonResponse(response_data)
-    else:
-        return JsonResponse({'error': 'No activated payslips found for the user'})
-

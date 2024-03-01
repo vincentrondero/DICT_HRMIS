@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 {% block calendar_js %}<script src ={% static "js/calendar.js" %}> </script>{% endblock calendar_js %}
+{% block dashboard_js %}<script src ={% static "js/dashboard.js" %}> </script>{% endblock dashboard_js %}
 {% block  content%}
+
 
 <div class="flex bg-white shadow-custom hover:shadow-xl rounded-2xl mx-2 my-3">
     <div class=" bg-custom-blue rounded-2xl p-4">
@@ -43,101 +45,142 @@
     </div>
     
 </div>
- 
-<div class="flex flex-grow">
-    <div class="flex-1 bg-gradient-to-r from-white to-blue-200 shadow-custom rounded-2xl m-2">
-        <div class="flex flex-col items-start p-4" draggable="true">
-            <span class="flex items-center h-6 px-3 text-md font-semibold text-blue-500 bg-blue-100 rounded-full">Mission</span>
-            <h4 class="mt-3 text-sm font-medium">DICT of the people and for the people.</h4>
-        </div>
-    </div>
-    <div class="flex-1 bg-gradient-to-r from-white to-blue-200 shadow-custom rounded-2xl m-2">
-        <div class="flex flex-col items-start p-4" draggable="true">
-            <span class="flex items-center h-6 px-3 text-md font-semibold text-blue-500 bg-blue-100 rounded-full">Vision</span>
-            <h4 class="mt-3 text-sm font-medium">An innovative, safe and happy nation that thrives through and is enabled by Information and Communications Technology.</h4>
-        </div>
-    </div>
-    <div class="max-w-sm w-full px-10 py-5 bg-white shadow-custom rounded-2xl m-2">
+
+<div class="flex mx-2">
+<div class="flex-col w-1/2">
+    <div class="flex space-x-2">
+        <div class="flex-1 max-w-md max-h-96 bg-blue-400 shadow-custom rounded-xl p-1">
+            <div class="px-4 flex items-center justify-between">
+                <div class="px-3 py-4 flex flex-col items-start" draggable="true">
+                    <span class="flex items-center h-6 px-3 text-md font-semibold text-blue-500 bg-blue-100 rounded-full">Mission</span>
+                    <h4 class="mt-3 text-sm font-medium text-white">DICT of the people and for the people.</h4>
+                </div>
+            </div>
+        </div> 
+        <div class="flex-1 max-w-md max-h-96 bg-blue-400 shadow-custom rounded-xl p-1">
+            <div class="px-4 flex items-center justify-between">
+                <div class="px-3 py-4 flex flex-col items-start" draggable="true">
+                    <span class="flex items-center h-6 px-3 text-md font-semibold text-blue-500 bg-blue-100 rounded-full">Vision</span>
+                    <h4 class="mt-3 text-sm font-medium text-white">An innovative, safe and happy nation that thrives through and is enabled by Information and Communications Technology.</h4>
+                </div>
+            </div>
+        </div> 
+    </div> 
+    <div class="flex mt-2 space-x-2">
+        <div class="flex-1 max-w-md max-h-96 bg-blue-500 shadow-custom rounded-xl p-1">
+            <div class="px-3 flex items-center justify-between">
+                <div class="text-left">
+                    <p class="text-5xl ml-3 text-font-bold text-white">{{ active_users }}</p>
+                    <h2 class="text-gray-100">Active Users</h2>
+                </div>
+                <div class="ml-auto">
+                    <svg width="75" height="75" viewBox="0 0 75 75" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M37.5 65.625C41.1934 65.625 44.8507 64.8975 48.263 63.4841C51.6753 62.0707 54.7757 59.999 57.3874 57.3874C59.999 54.7757 62.0707 51.6753 63.4841 48.263C64.8975 44.8507 65.625 41.1934 65.625 37.5C65.625 33.8066 64.8975 30.1493 63.4841 26.737C62.0707 23.3247 59.999 20.2243 57.3874 17.6126C54.7757 15.001 51.6753 12.9293 48.263 11.5159C44.8507 10.1025 41.1934 9.375 37.5 9.375C30.0408 9.375 22.8871 12.3382 17.6126 17.6126C12.3382 22.8871 9.375 30.0408 9.375 37.5C9.375 44.9592 12.3382 52.1129 17.6126 57.3874C22.8871 62.6618 30.0408 65.625 37.5 65.625ZM36.775 48.875L52.4 30.125L47.6 26.125L34.1625 42.2469L27.2094 35.2906L22.7906 39.7094L32.1656 49.0844L34.5844 51.5031L36.775 48.875Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+        </div>    
+        <div class="flex-1 max-w-md max-h-96 bg-blue-400 shadow-custom rounded-xl p-1">
+            <div class="px-3 flex items-center justify-between">
+                <div class="text-left">
+                    <p class="text-5xl ml-3 text-font-bold text-white">{{ archive_users }}</p>
+                    <h2 class="text-gray-100">Archive Users</h2>
+                </div>
+                <div class="ml-auto">
+                    <svg width="65" height="65" viewBox="0 0 61 61" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M61 30.5C61 47.3447 47.3447 61 30.5 61C13.6553 61 0 47.3447 0 30.5C0 13.6553 13.6553 0 30.5 0C47.3447 0 61 13.6553 61 30.5ZM14.6396 15.4533H47.173V25.4844H14.6396V15.4533ZM16.8085 42.5373V27.4907H45.0041V42.5373C45.0041 43.3355 44.6613 44.1009 44.0512 44.6653C43.4411 45.2296 42.6136 45.5467 41.7508 45.5467H20.0619C19.199 45.5467 18.3715 45.2296 17.7614 44.6653C17.1513 44.1009 16.8085 43.3355 16.8085 42.5373ZM25.4841 33.5093H36.3285V31.5031H25.4841V33.5093Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+        </div>    
+    </div> 
+    <div class="flex mt-2 space-x-2">
+        <div class="flex-1 max-w-md max-h-96 bg-blue-300 shadow-custom rounded-xl p-1">
+            <div class="px-3 flex items-center justify-between">
+                <div class="text-left">
+                    <p class="text-5xl ml-3 text-font-bold text-white">{{ users }}</p>
+                    <h2 class="text-gray-100">Total Users</h2>
+                </div>
+                <div class="ml-auto">
+                    <svg width="75" height="75" viewBox="0 0 75 75" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M37.9247 7.03125C20.789 6.79981 6.79971 20.7891 7.03115 37.9248C7.25967 54.3589 20.641 67.7402 37.0751 67.9687C54.2138 68.2031 68.2001 54.2139 67.9657 37.0781C67.7401 20.6411 54.3588 7.25977 37.9247 7.03125ZM37.3856 29.313C37.4164 29.1372 37.4501 28.9614 37.4896 28.7871C37.8596 27.0764 38.684 25.497 39.8759 24.2153C41.7641 22.2041 44.4403 21.0938 47.4125 21.0938C48.663 21.0886 49.9049 21.2997 51.0834 21.7178C52.5484 22.2394 53.8676 23.1032 54.9315 24.2373C56.4966 25.9289 57.4282 28.1099 57.5683 30.4102C57.6088 30.9661 57.6088 31.5242 57.5683 32.0801C57.4554 33.6556 57.048 35.1959 56.3671 36.6211C56.2929 36.7764 56.2152 36.9302 56.1342 37.0825C55.9716 37.3857 55.7973 37.6831 55.6098 37.9702C55.2365 38.5434 54.8135 39.0826 54.3456 39.5815C52.4237 41.6323 49.9628 42.7647 47.4154 42.7647C46.4602 42.764 45.5116 42.6067 44.6073 42.2988C44.3035 42.1957 44.0053 42.0769 43.7138 41.9429C42.4929 41.3733 41.3948 40.5713 40.4809 39.5815C38.5784 37.518 37.441 34.8647 37.2582 32.064C37.2318 31.6851 37.223 31.3101 37.2318 30.939C37.2432 30.3949 37.2946 29.8524 37.3856 29.3159V29.313ZM15.4525 32.8784C15.5238 31.8332 15.7818 30.8092 16.2143 29.855C16.3363 29.5892 16.4722 29.3301 16.6215 29.0786C16.9201 28.5746 17.2733 28.105 17.6747 27.6782C18.2693 27.0439 18.9617 26.5088 19.7255 26.0933C20.107 25.8848 20.5042 25.7065 20.9135 25.5601C22.4819 25.0115 24.1681 24.8907 25.7987 25.21C27.5265 25.5441 29.1046 26.4157 30.3075 27.7002C31.735 29.2411 32.5394 31.2571 32.5648 33.3574C32.5722 33.6665 32.5648 33.9771 32.5429 34.292C32.4535 35.498 32.1561 36.6795 31.664 37.7842C31.4283 38.316 31.1475 38.8267 30.8246 39.3105C30.2036 40.249 29.4221 41.0706 28.516 41.7378C28.2963 41.8945 28.0678 42.041 27.8319 42.1875C27.3681 42.4638 26.8773 42.692 26.3671 42.8687C25.6043 43.1352 24.8021 43.2719 23.994 43.273C23.8578 43.273 23.7216 43.2729 23.5868 43.2612C23.3177 43.2465 23.0497 43.2162 22.7841 43.1704C22.5198 43.1244 22.2582 43.0643 22.0004 42.9902C21.6131 42.8784 21.235 42.7369 20.8695 42.5669C20.7465 42.5098 20.6264 42.4497 20.5062 42.3867C17.8695 40.9966 15.8817 38.1152 15.4921 34.752C15.4745 34.5981 15.4599 34.4443 15.4496 34.2891C15.4165 33.8194 15.4175 33.3479 15.4525 32.8784ZM23.351 59.0405C19.4508 56.4697 16.3162 52.8944 14.2777 48.6914C14.2112 48.557 14.1987 48.4022 14.2428 48.2588C14.2869 48.1155 14.3844 47.9946 14.515 47.9209C17.2367 46.3901 20.7128 45.5566 23.997 45.5566C26.4872 45.5566 28.494 45.8496 30.2504 46.418C30.4495 46.4835 30.6274 46.6013 30.7655 46.7589C30.9037 46.9166 30.997 47.1085 31.0357 47.3145C31.0745 47.5205 31.0572 47.7331 30.9858 47.9302C30.9144 48.1273 30.7915 48.3017 30.6298 48.4351C27.2094 51.2183 25.0048 54.6665 23.9691 58.7988C23.9536 58.862 23.9232 58.9206 23.8803 58.9696C23.8374 59.0185 23.7834 59.0564 23.7228 59.0801C23.6622 59.1038 23.5968 59.1126 23.5321 59.1057C23.4673 59.0988 23.4052 59.0765 23.351 59.0405ZM37.4999 63.2812C34.2019 63.2846 30.9343 62.6519 27.8759 61.418C27.7509 61.3664 27.6476 61.2731 27.5835 61.154C27.5195 61.035 27.4985 60.8974 27.5243 60.7646C27.5829 60.4644 27.6474 60.1904 27.7045 59.9619C28.7475 55.7974 31.3314 52.3447 35.1752 49.9746C38.5868 47.8726 42.9389 46.7153 47.4096 46.7153C51.974 46.7153 56.1986 47.8257 59.6381 49.9248C59.7257 49.9796 59.7886 50.0663 59.8134 50.1667C59.8383 50.267 59.8232 50.373 59.7714 50.4624C57.5032 54.3591 54.2532 57.5933 50.3455 59.8425C46.4377 62.0916 42.0087 63.2773 37.4999 63.2812Z" fill="white"/>
+                        <path d="M32.5444 34.2847C32.5664 33.9697 32.5737 33.6592 32.5664 33.3501C32.5742 33.6577 32.5669 33.9692 32.5444 34.2847ZM15.4951 34.7446C15.8848 38.1138 17.877 40.9893 20.5093 42.3794C17.8711 40.9893 15.8848 38.1079 15.4951 34.7446ZM37.2568 32.0801C37.2305 31.7012 37.2217 31.3262 37.2305 30.9551C37.2217 31.3213 37.2305 31.6963 37.2568 32.0801Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+        </div>    
+        <div class="flex-1 max-w-md max-h-96 bg-blue-200 shadow-custom rounded-xl p-1">
+            <div class="px-3 flex items-center justify-between">
+                <div class="text-left">
+                    <p class="text-5xl ml-3 text-font-bold text-white">{{ active_users }}</p>
+                    <h2 class="text-gray-100">Active Users</h2>
+                </div>
+                <div class="ml-auto">
+                    <svg width="75" height="75" viewBox="0 0 75 75" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M37.5 65.625C41.1934 65.625 44.8507 64.8975 48.263 63.4841C51.6753 62.0707 54.7757 59.999 57.3874 57.3874C59.999 54.7757 62.0707 51.6753 63.4841 48.263C64.8975 44.8507 65.625 41.1934 65.625 37.5C65.625 33.8066 64.8975 30.1493 63.4841 26.737C62.0707 23.3247 59.999 20.2243 57.3874 17.6126C54.7757 15.001 51.6753 12.9293 48.263 11.5159C44.8507 10.1025 41.1934 9.375 37.5 9.375C30.0408 9.375 22.8871 12.3382 17.6126 17.6126C12.3382 22.8871 9.375 30.0408 9.375 37.5C9.375 44.9592 12.3382 52.1129 17.6126 57.3874C22.8871 62.6618 30.0408 65.625 37.5 65.625ZM36.775 48.875L52.4 30.125L47.6 26.125L34.1625 42.2469L27.2094 35.2906L22.7906 39.7094L32.1656 49.0844L34.5844 51.5031L36.775 48.875Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+        </div>    
+    </div> 
+</div>
+<div class="flex ml-1 w-1/2">
+    <div class="w-full px-5 py-5 bg-white shadow-custom rounded-lg min-h-full" >
         <div class="flex items-center justify-between">
-            <span id="currentMonthYear" class="text-blue-500 bg-blue-100 rounded-full items-center h-6 px-3"></span>
+            <span id="currentMonthYear" class="text-lg font-semibold text-blue-500 bg-blue-100 rounded-full items-center px-8"></span>
             <div class="flex items-center">
-                <button id="prevMonth" aria-label="calendar backward" class="focus:text-gray-400 hover:text-gray-400 text-gray-800 dark:text-gray-100">
+                <button id="prevMonth" aria-label="calendar backward" class="focus:text-gray-400 hover:text-gray-400 text-gray-800 dark:text-gray-100 text-lg">
                     &lt;
                 </button>
-                <button id="nextMonth" aria-label="calendar forward" class="focus:text-gray-400 hover:text-gray-400 ml-3 text-gray-800 dark:text-gray-100">
+                <button id="nextMonth" aria-label="calendar forward" class="focus:text-gray-400 hover:text-gray-400 ml-2 text-gray-800 dark:text-gray-100 text-lg">
                     &gt;
                 </button>
             </div>
         </div>
-        <div class="flex justify-between">
-            <div class="text-base font-medium text-center text-gray-800 dark:text-gray-100">Su</div>
-            <div class="text-base font-medium text-center text-gray-800 dark:text-gray-100">Mo</div>
-            <div class="text-base font-medium text-center text-gray-800 dark:text-gray-100">Tu</div>
-            <div class="text-base font-medium text-center text-gray-800 dark:text-gray-100">We</div>
-            <div class="text-base font-medium text-center text-gray-800 dark:text-gray-100">Th</div>
-            <div class="text-base font-medium text-center text-gray-800 dark:text-gray-100">Fr</div>
-            <div class="text-base font-medium text-center text-gray-800 dark:text-gray-100">Sa</div>
+        
+        <div class="grid grid-cols-7">
+            <div class="text-lg font-medium text-center text-gray-800 dark:text-gray-100">Su</div>
+            <div class="text-lg font-medium text-center text-gray-800 dark:text-gray-100">Mo</div>
+            <div class="text-lg font-medium text-center text-gray-800 dark:text-gray-100">Tu</div>
+            <div class="text-lg font-medium text-center text-gray-800 dark:text-gray-100">We</div>
+            <div class="text-lg font-medium text-center text-gray-800 dark:text-gray-100">Th</div>
+            <div class="text-lg font-medium text-center text-gray-800 dark:text-gray-100">Fr</div>
+            <div class="text-lg font-medium text-center text-gray-800 dark:text-gray-100">Sa</div>
         </div>
-        <div id="calendarDates" class="grid grid-cols-7 grid-rows-7 bg-white" style="min-height: 200px;">
-        </div>    
+        <div id="calendarDates" class="grid grid-cols-7 grid-rows-7 bg-white justify-center items-center" style="justify-items: center; align-items: center;">
+            
+          </div>
+        </div> 
     </div>
-</div>
+</div>          
 
-<div class="flex space-x-3 mx-2 my-2">
-    <div class="flex-1 max-w-md max-h-96 bg-blue-500 shadow-custom rounded-xl p-1">
-        <div class="px-3 flex items-center justify-between">
-            <div class="text-left">
-                <p class="text-5xl ml-3 text-font-bold text-white">{{ active_users }}</p>
-                <h2 class="text-gray-100">Active Users</h2>
-            </div>
-            <div class="ml-auto">
-                <svg width="75" height="75" viewBox="0 0 75 75" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M37.5 65.625C41.1934 65.625 44.8507 64.8975 48.263 63.4841C51.6753 62.0707 54.7757 59.999 57.3874 57.3874C59.999 54.7757 62.0707 51.6753 63.4841 48.263C64.8975 44.8507 65.625 41.1934 65.625 37.5C65.625 33.8066 64.8975 30.1493 63.4841 26.737C62.0707 23.3247 59.999 20.2243 57.3874 17.6126C54.7757 15.001 51.6753 12.9293 48.263 11.5159C44.8507 10.1025 41.1934 9.375 37.5 9.375C30.0408 9.375 22.8871 12.3382 17.6126 17.6126C12.3382 22.8871 9.375 30.0408 9.375 37.5C9.375 44.9592 12.3382 52.1129 17.6126 57.3874C22.8871 62.6618 30.0408 65.625 37.5 65.625ZM36.775 48.875L52.4 30.125L47.6 26.125L34.1625 42.2469L27.2094 35.2906L22.7906 39.7094L32.1656 49.0844L34.5844 51.5031L36.775 48.875Z" fill="white"/>
-                </svg>
-            </div>
-        </div>
-    </div>       
-    <div class="flex-1 max-w-md max-h-96 bg-blue-400 shadow-custom rounded-xl p-1">
-        <div class="px-4 flex items-center justify-between">
-            <div class="text-left">
-                <p class="text-5xl ml-3 text-font-bold text-white">{{ users }}</p>
-                <h2 class="text-gray-100">Archive Users</h2>
-            </div>
-            <div class="ml-auto">
-                <svg width="75" height="75" viewBox="0 0 75 75" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M37.9247 7.03125C20.789 6.79981 6.79971 20.7891 7.03115 37.9248C7.25967 54.3589 20.641 67.7402 37.0751 67.9687C54.2138 68.2031 68.2001 54.2139 67.9657 37.0781C67.7401 20.6411 54.3588 7.25977 37.9247 7.03125ZM37.3856 29.313C37.4164 29.1372 37.4501 28.9614 37.4896 28.7871C37.8596 27.0764 38.684 25.497 39.8759 24.2153C41.7641 22.2041 44.4403 21.0938 47.4125 21.0938C48.663 21.0886 49.9049 21.2997 51.0834 21.7178C52.5484 22.2394 53.8676 23.1032 54.9315 24.2373C56.4966 25.9289 57.4282 28.1099 57.5683 30.4102C57.6088 30.9661 57.6088 31.5242 57.5683 32.0801C57.4554 33.6556 57.048 35.1959 56.3671 36.6211C56.2929 36.7764 56.2152 36.9302 56.1342 37.0825C55.9716 37.3857 55.7973 37.6831 55.6098 37.9702C55.2365 38.5434 54.8135 39.0826 54.3456 39.5815C52.4237 41.6323 49.9628 42.7647 47.4154 42.7647C46.4602 42.764 45.5116 42.6067 44.6073 42.2988C44.3035 42.1957 44.0053 42.0769 43.7138 41.9429C42.4929 41.3733 41.3948 40.5713 40.4809 39.5815C38.5784 37.518 37.441 34.8647 37.2582 32.064C37.2318 31.6851 37.223 31.3101 37.2318 30.939C37.2432 30.3949 37.2946 29.8524 37.3856 29.3159V29.313ZM15.4525 32.8784C15.5238 31.8332 15.7818 30.8092 16.2143 29.855C16.3363 29.5892 16.4722 29.3301 16.6215 29.0786C16.9201 28.5746 17.2733 28.105 17.6747 27.6782C18.2693 27.0439 18.9617 26.5088 19.7255 26.0933C20.107 25.8848 20.5042 25.7065 20.9135 25.5601C22.4819 25.0115 24.1681 24.8907 25.7987 25.21C27.5265 25.5441 29.1046 26.4157 30.3075 27.7002C31.735 29.2411 32.5394 31.2571 32.5648 33.3574C32.5722 33.6665 32.5648 33.9771 32.5429 34.292C32.4535 35.498 32.1561 36.6795 31.664 37.7842C31.4283 38.316 31.1475 38.8267 30.8246 39.3105C30.2036 40.249 29.4221 41.0706 28.516 41.7378C28.2963 41.8945 28.0678 42.041 27.8319 42.1875C27.3681 42.4638 26.8773 42.692 26.3671 42.8687C25.6043 43.1352 24.8021 43.2719 23.994 43.273C23.8578 43.273 23.7216 43.2729 23.5868 43.2612C23.3177 43.2465 23.0497 43.2162 22.7841 43.1704C22.5198 43.1244 22.2582 43.0643 22.0004 42.9902C21.6131 42.8784 21.235 42.7369 20.8695 42.5669C20.7465 42.5098 20.6264 42.4497 20.5062 42.3867C17.8695 40.9966 15.8817 38.1152 15.4921 34.752C15.4745 34.5981 15.4599 34.4443 15.4496 34.2891C15.4165 33.8194 15.4175 33.3479 15.4525 32.8784ZM23.351 59.0405C19.4508 56.4697 16.3162 52.8944 14.2777 48.6914C14.2112 48.557 14.1987 48.4022 14.2428 48.2588C14.2869 48.1155 14.3844 47.9946 14.515 47.9209C17.2367 46.3901 20.7128 45.5566 23.997 45.5566C26.4872 45.5566 28.494 45.8496 30.2504 46.418C30.4495 46.4835 30.6274 46.6013 30.7655 46.7589C30.9037 46.9166 30.997 47.1085 31.0357 47.3145C31.0745 47.5205 31.0572 47.7331 30.9858 47.9302C30.9144 48.1273 30.7915 48.3017 30.6298 48.4351C27.2094 51.2183 25.0048 54.6665 23.9691 58.7988C23.9536 58.862 23.9232 58.9206 23.8803 58.9696C23.8374 59.0185 23.7834 59.0564 23.7228 59.0801C23.6622 59.1038 23.5968 59.1126 23.5321 59.1057C23.4673 59.0988 23.4052 59.0765 23.351 59.0405ZM37.4999 63.2812C34.2019 63.2846 30.9343 62.6519 27.8759 61.418C27.7509 61.3664 27.6476 61.2731 27.5835 61.154C27.5195 61.035 27.4985 60.8974 27.5243 60.7646C27.5829 60.4644 27.6474 60.1904 27.7045 59.9619C28.7475 55.7974 31.3314 52.3447 35.1752 49.9746C38.5868 47.8726 42.9389 46.7153 47.4096 46.7153C51.974 46.7153 56.1986 47.8257 59.6381 49.9248C59.7257 49.9796 59.7886 50.0663 59.8134 50.1667C59.8383 50.267 59.8232 50.373 59.7714 50.4624C57.5032 54.3591 54.2532 57.5933 50.3455 59.8425C46.4377 62.0916 42.0087 63.2773 37.4999 63.2812Z" fill="white"/>
-                    <path d="M32.5444 34.2847C32.5664 33.9697 32.5737 33.6592 32.5664 33.3501C32.5742 33.6577 32.5669 33.9692 32.5444 34.2847ZM15.4951 34.7446C15.8848 38.1138 17.877 40.9893 20.5093 42.3794C17.8711 40.9893 15.8848 38.1079 15.4951 34.7446ZM37.2568 32.0801C37.2305 31.7012 37.2217 31.3262 37.2305 30.9551C37.2217 31.3213 37.2305 31.6963 37.2568 32.0801Z" fill="white"/>
-                </svg>
-            </div>
-        </div>
-    </div>  
-    <div class="flex-1 max-w-md max-h-96 bg-blue-300 shadow-custom rounded-xl p-1">
-        <div class="px-4 flex items-center justify-between">
-            <div class="text-left">
-                <p class="text-5xl ml-3 text-font-bold text-white">{{ archive_users }}</p>
-                <h2 class="text-gray-100">Archive Users</h2>
-            </div>
-            <div class="ml-auto">
-                <svg width="65" height="65" viewBox="0 0 61 61" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M61 30.5C61 47.3447 47.3447 61 30.5 61C13.6553 61 0 47.3447 0 30.5C0 13.6553 13.6553 0 30.5 0C47.3447 0 61 13.6553 61 30.5ZM14.6396 15.4533H47.173V25.4844H14.6396V15.4533ZM16.8085 42.5373V27.4907H45.0041V42.5373C45.0041 43.3355 44.6613 44.1009 44.0512 44.6653C43.4411 45.2296 42.6136 45.5467 41.7508 45.5467H20.0619C19.199 45.5467 18.3715 45.2296 17.7614 44.6653C17.1513 44.1009 16.8085 43.3355 16.8085 42.5373ZM25.4841 33.5093H36.3285V31.5031H25.4841V33.5093Z" fill="white"/>
-                </svg>
-            </div>
-        </div>
-    </div> 
-    <div class="flex-1 max-w-md max-h-96 bg-blue-200 shadow-custom rounded-xl p-1">
-        <div class="px-4 flex items-center justify-between">
-            <div class="text-left">
-                <p class="text-5xl ml-3 text-font-bold text-white">{{ users }}</p>
-                <h2 class="text-gray-100">Total Users</h2>
-            </div>
-            <div class="ml-auto">
-                <svg width="75" height="75" viewBox="0 0 75 75" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M37.9247 7.03125C20.789 6.79981 6.79971 20.7891 7.03115 37.9248C7.25967 54.3589 20.641 67.7402 37.0751 67.9687C54.2138 68.2031 68.2001 54.2139 67.9657 37.0781C67.7401 20.6411 54.3588 7.25977 37.9247 7.03125ZM37.3856 29.313C37.4164 29.1372 37.4501 28.9614 37.4896 28.7871C37.8596 27.0764 38.684 25.497 39.8759 24.2153C41.7641 22.2041 44.4403 21.0938 47.4125 21.0938C48.663 21.0886 49.9049 21.2997 51.0834 21.7178C52.5484 22.2394 53.8676 23.1032 54.9315 24.2373C56.4966 25.9289 57.4282 28.1099 57.5683 30.4102C57.6088 30.9661 57.6088 31.5242 57.5683 32.0801C57.4554 33.6556 57.048 35.1959 56.3671 36.6211C56.2929 36.7764 56.2152 36.9302 56.1342 37.0825C55.9716 37.3857 55.7973 37.6831 55.6098 37.9702C55.2365 38.5434 54.8135 39.0826 54.3456 39.5815C52.4237 41.6323 49.9628 42.7647 47.4154 42.7647C46.4602 42.764 45.5116 42.6067 44.6073 42.2988C44.3035 42.1957 44.0053 42.0769 43.7138 41.9429C42.4929 41.3733 41.3948 40.5713 40.4809 39.5815C38.5784 37.518 37.441 34.8647 37.2582 32.064C37.2318 31.6851 37.223 31.3101 37.2318 30.939C37.2432 30.3949 37.2946 29.8524 37.3856 29.3159V29.313ZM15.4525 32.8784C15.5238 31.8332 15.7818 30.8092 16.2143 29.855C16.3363 29.5892 16.4722 29.3301 16.6215 29.0786C16.9201 28.5746 17.2733 28.105 17.6747 27.6782C18.2693 27.0439 18.9617 26.5088 19.7255 26.0933C20.107 25.8848 20.5042 25.7065 20.9135 25.5601C22.4819 25.0115 24.1681 24.8907 25.7987 25.21C27.5265 25.5441 29.1046 26.4157 30.3075 27.7002C31.735 29.2411 32.5394 31.2571 32.5648 33.3574C32.5722 33.6665 32.5648 33.9771 32.5429 34.292C32.4535 35.498 32.1561 36.6795 31.664 37.7842C31.4283 38.316 31.1475 38.8267 30.8246 39.3105C30.2036 40.249 29.4221 41.0706 28.516 41.7378C28.2963 41.8945 28.0678 42.041 27.8319 42.1875C27.3681 42.4638 26.8773 42.692 26.3671 42.8687C25.6043 43.1352 24.8021 43.2719 23.994 43.273C23.8578 43.273 23.7216 43.2729 23.5868 43.2612C23.3177 43.2465 23.0497 43.2162 22.7841 43.1704C22.5198 43.1244 22.2582 43.0643 22.0004 42.9902C21.6131 42.8784 21.235 42.7369 20.8695 42.5669C20.7465 42.5098 20.6264 42.4497 20.5062 42.3867C17.8695 40.9966 15.8817 38.1152 15.4921 34.752C15.4745 34.5981 15.4599 34.4443 15.4496 34.2891C15.4165 33.8194 15.4175 33.3479 15.4525 32.8784ZM23.351 59.0405C19.4508 56.4697 16.3162 52.8944 14.2777 48.6914C14.2112 48.557 14.1987 48.4022 14.2428 48.2588C14.2869 48.1155 14.3844 47.9946 14.515 47.9209C17.2367 46.3901 20.7128 45.5566 23.997 45.5566C26.4872 45.5566 28.494 45.8496 30.2504 46.418C30.4495 46.4835 30.6274 46.6013 30.7655 46.7589C30.9037 46.9166 30.997 47.1085 31.0357 47.3145C31.0745 47.5205 31.0572 47.7331 30.9858 47.9302C30.9144 48.1273 30.7915 48.3017 30.6298 48.4351C27.2094 51.2183 25.0048 54.6665 23.9691 58.7988C23.9536 58.862 23.9232 58.9206 23.8803 58.9696C23.8374 59.0185 23.7834 59.0564 23.7228 59.0801C23.6622 59.1038 23.5968 59.1126 23.5321 59.1057C23.4673 59.0988 23.4052 59.0765 23.351 59.0405ZM37.4999 63.2812C34.2019 63.2846 30.9343 62.6519 27.8759 61.418C27.7509 61.3664 27.6476 61.2731 27.5835 61.154C27.5195 61.035 27.4985 60.8974 27.5243 60.7646C27.5829 60.4644 27.6474 60.1904 27.7045 59.9619C28.7475 55.7974 31.3314 52.3447 35.1752 49.9746C38.5868 47.8726 42.9389 46.7153 47.4096 46.7153C51.974 46.7153 56.1986 47.8257 59.6381 49.9248C59.7257 49.9796 59.7886 50.0663 59.8134 50.1667C59.8383 50.267 59.8232 50.373 59.7714 50.4624C57.5032 54.3591 54.2532 57.5933 50.3455 59.8425C46.4377 62.0916 42.0087 63.2773 37.4999 63.2812Z" fill="white"/>
-                    <path d="M32.5444 34.2847C32.5664 33.9697 32.5737 33.6592 32.5664 33.3501C32.5742 33.6577 32.5669 33.9692 32.5444 34.2847ZM15.4951 34.7446C15.8848 38.1138 17.877 40.9893 20.5093 42.3794C17.8711 40.9893 15.8848 38.1079 15.4951 34.7446ZM37.2568 32.0801C37.2305 31.7012 37.2217 31.3262 37.2305 30.9551C37.2217 31.3213 37.2305 31.6963 37.2568 32.0801Z" fill="white"/>
-                </svg>
-            </div>
-        </div>
-    </div> 
-</div>
+<div id="full_day_percent" style="display: none;">{{ percentage_full_attendance }}</div>
+<div id="late_percent" style="display: none;">{{ percentage_late_attendance }}</div>
+<div id="absent_percent" style="display: none;">{{ percentage_absent_attendance }}</div>
 
+
+<div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+    <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Attendance Metrics</h5>
+    <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+      <div class="grid grid-cols-3 gap-3 mb-2">
+        <dl class="bg-orange-50 dark:bg-gray-600 rounded-lg flex flex-col items-center justify-center h-[78px]">
+          <dt class="w-8 h-8 rounded-full bg-orange-100 dark:bg-gray-500 text-orange-600 dark:text-orange-300 text-sm font-medium flex items-center justify-center mb-1">{{full_day_attendance_count}}</dt>
+          <dd class="text-orange-600 dark:text-orange-300 text-sm font-medium">Complete</dd>
+        </dl>
+        <dl class="bg-teal-50 dark:bg-gray-600 rounded-lg flex flex-col items-center justify-center h-[78px]">
+          <dt class="w-8 h-8 rounded-full bg-teal-100 dark:bg-gray-500 text-teal-600 dark:text-teal-300 text-sm font-medium flex items-center justify-center mb-1">{{late_attendance_count}}</dt>
+          <dd class="text-teal-600 dark:text-teal-300 text-sm font-medium">Late</dd>
+        </dl>
+        <dl class="bg-blue-50 dark:bg-gray-600 rounded-lg flex flex-col items-center justify-center h-[78px]">
+          <dt class="w-8 h-8 rounded-full bg-blue-100 dark:bg-gray-500 text-blue-600 dark:text-blue-300 text-sm font-medium flex items-center justify-center mb-1">{{late_attendance_count}}</dt>
+          <dd class="text-blue-600 dark:text-blue-300 text-sm font-medium">Absent</dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Radial Chart -->
+    <div class="py-6" id="radial-chart"></div>
+  
+  </div>
+  
 {% endblock content%}
