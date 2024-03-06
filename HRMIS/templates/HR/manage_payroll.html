@@ -43,12 +43,12 @@
                 <td class="text-center align-middle" style="padding-top: 20px; padding-bottom: 20px">{{ user.username }}</td>
                 <td class="text-center align-middle" style="padding-top: 20px; padding-bottom: 20px">{{ user.salary_grade }}</td>
                 <td class="flex items-center justify-center" style="padding-top: 20px; padding-bottom: 20px">
-                    <button class="flex items-center bg-custom-blue text-white text-xs p-2 rounded-md" onclick="showUserAttendance('{{ user.username }}')">
+                    <button class="flex items-center bg-custom-blue text-white text-xs p-2 rounded-md" onclick="fetchUserAttendance('{{ user.username }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg mr-1" viewBox="0 0 24 24">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M20 4H4C3.73478 4 3.48043 4.10536 3.29289 4.29289C3.10536 4.48043 3 4.73478 3 5V19C3 19.2652 3.10536 19.5196 3.29289 19.7071C3.48043 19.8946 3.73478 20 4 20H20C20.2652 20 20.5196 19.8946 20.7071 19.7071C20.8946 19.5196 21 19.2652 21 19V5C21 4.73478 20.8946 4.48043 20.7071 4.29289C20.5196 4.10536 20.2652 4 20 4ZM4 2C3.20435 2 2.44129 2.31607 1.87868 2.87868C1.31607 3.44129 1 4.20435 1 5V19C1 19.7956 1.31607 20.5587 1.87868 21.1213C2.44129 21.6839 3.20435 22 4 22H20C20.7956 22 21.5587 21.6839 22.1213 21.1213C22.6839 20.5587 23 19.7956 23 19V5C23 4.20435 22.6839 3.44129 22.1213 2.87868C21.5587 2.31607 20.7956 2 20 2H4ZM6 7H8V9H6V7ZM11 7C10.7348 7 10.4804 7.10536 10.2929 7.29289C10.1054 7.48043 10 7.73478 10 8C10 8.26522 10.1054 8.51957 10.2929 8.70711C10.4804 8.89464 10.7348 9 11 9H17C17.2652 9 17.5196 8.89464 17.7071 8.70711C17.8946 8.51957 18 8.26522 18 8C18 7.73478 17.8946 7.48043 17.7071 7.29289C17.5196 7.10536 17.2652 7 17 7H11ZM8 11H6V13H8V11ZM10 12C10 11.7348 10.1054 11.4804 10.2929 11.2929C10.4804 11.1054 10.7348 11 11 11H17C17.2652 11 17.5196 11.1054 17.7071 11.2929C17.8946 11.4804 18 11.7348 18 12C18 12.2652 17.8946 12.5196 17.7071 12.7071C17.5196 12.8946 17.2652 13 17 13H11C10.7348 13 10.4804 12.8946 10.2929 12.7071C10.1054 12.5196 10 12.2652 10 12ZM8 15H6V17H8V15ZM10 16C10 15.7348 10.1054 15.4804 10.2929 15.2929C10.4804 15.1054 10.7348 15 11 15H17C17.2652 15 17.5196 15.1054 17.7071 15.2929C17.8946 15.4804 18 15.7348 18 16C18 16.2652 17.8946 16.5196 17.7071 16.7071C17.5196 16.8946 17.2652 17 17 17H11C10.7348 17 10.4804 16.8946 10.2929 16.7071C10.1054 16.5196 10 16.2652 10 16Z"/>
                         </svg>
                         Attendance
-                    </button>                    
+                    </button>                                       
                 </td>
                 <td class="text-center align-middle" style="padding-top: 20px; padding-bottom: 20px">
                     <button class="bg-custom-button1 p-2 rounded-md" onclick="calculateSalary('{{ user.username }}')">
@@ -91,6 +91,7 @@
         </form>
     </div>
 </div>   
+
 <div id="cleansedDataModal" class="modal fixed top-0 left-0 hidden">
     <div class="modal-dialog flex items-center justify-center min-h-full">
         <div class="modal-content bg-white max-w-full max-h-full p-6 rounded shadow-lg overflow-y-auto">
@@ -133,31 +134,6 @@
     </div>
 </div>
 
-<div id="attendanceModal" class="modal fixed top-0 left-0 hidden">
-    <div class="modal-dialog flex items-center justify-center min-h-full">
-        <div class="modal-content bg-white max-w-full max-h-full p-6 rounded shadow-lg overflow-y-auto">
-            <div class="modal-body">
-                <table class="table-auto w-full">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-2">Date</th>
-                            <th class="px-4 py-2">Time In</th>
-                            <th class="px-4 py-2">Time Out</th>
-                            <th class="px-4 py-2">Remarks</th>
-                            <th class="px-4 py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userAttendanceDetails">
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer flex justify-end">
-                <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mr-2" onclick="closeAttendanceModal()">Close</button>
-                <button type="button" class="bg-green-300 hover:bg-green-500 text-gray-50 font-semibold hover:text-white py-2 px-4 rounded mr-2" onclick="closeAttendanceModal()">Add Attendance</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div id="salaryModal" class="modal fixed top-0 left-0 flex items-center justify-center">
     <div class="modal-content bg-white p-6 rounded shadow-md" style="width: 30rem;">
@@ -354,4 +330,5 @@
         <button onclick="activatePayslip('{{ username }}')" class="bg-green-400 hover:bg-green-500 hover:text-white text-gray-200 font-bold py-2 px-8 rounded mt-10">Yes</button>
     </div>
 </div>
+
 {% endblock content %}

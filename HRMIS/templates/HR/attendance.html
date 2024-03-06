@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+{% block attendance_js %}<script src ={% static "js/attendance.js" %}> </script>{% endblock attendance_js %}
+{% block content %}
+    {% if attendances %}
+        <table class="m-2" style="width: 98%;">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2">Date</th>
+                    <th class="px-4 py-2">Time In</th>
+                    <th class="px-4 py-2">Time Out</th>
+                    <th class="px-4 py-2">Minutes Late</th>
+                    <th class="px-4 py-2">Remarks</th>
+                    <th class="px-4 py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attendance in attendances|dictsort:"date" %}
+                <tr class="">
+                        <td class="text-center align-middle bg-white border border-2" >{{ attendance.date }}</td>
+                        <td class="text-center align-middle">{{ attendance.time_in }}</td>
+                        <td class="text-center align-middle">{{ attendance.time_out }}</td>
+                        <td class="text-center align-middle bg-white border border-2">{{ attendance.late }}</td>
+                        <td class="text-center align-middle">{{ attendance.remark }}</td>
+                        <td class="text-center align-middle"> 
+                            <button class="bg-custom-button1 text-white text-xs p-2 rounded-md" onclick="openAttendanceEditModal('{{ attendance.id }}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg" viewBox="0 0 24 24">
+                                    <path d="M7 17.013L11.413 16.998L21.045 7.45799C21.423 7.07999 21.631 6.57799 21.631 6.04399C21.631 5.50999 21.423 5.00799 21.045 4.62999L19.459 3.04399C18.703 2.28799 17.384 2.29199 16.634 3.04099L7 12.583V17.013ZM18.045 4.45799L19.634 6.04099L18.037 7.62299L16.451 6.03799L18.045 4.45799ZM9 13.417L15.03 7.44399L16.616 9.02999L10.587 15.001L9 15.006V13.417Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                                    <path d="M5 21H19C20.103 21 21 20.103 21 19V10.332L19 12.332V19H8.158C8.132 19 8.105 19.01 8.079 19.01C8.046 19.01 8.013 19.001 7.979 19H5V5H11.847L13.847 3H5C3.897 3 3 3.897 3 5V19C3 20.103 3.897 21 5 21Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No attendance data available.</p>
+    {% endif %}
+    <div class=" flex justify-end">
+        <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mr-2" onclick="closeAttendanceModal()">Close</button>
+        <button type="button" class="bg-green-300 hover:bg-green-500 text-gray-50 font-semibold hover:text-white py-2 px-4 rounded mr-2"  onclick="openAddAttendanceModal()">Add Attendance</button>
+    </div>
+
+
+    <div id="AttendanceEditModal" class="modal">
+        <div class="modal-content bg-white p-4 rounded-md">
+                <div class="flex space-x-3">
+                    <div class="w-full md:w-1/2 mb-4">
+                        <label for="editEmployee" class="block">Employee:</label>
+                        <input type="text" id="editEmployee" name="editEmployee" readonly class="w-full p-2 border rounded-md" />
+                    </div>
+        
+                    <div class="w-full md:w-1/2 mb-4">
+                        <label for="editDate" class="block">Date:</label>
+                        <input type="text" id="editDate" name="editDate" readonly class="w-full p-2 border rounded-md" />
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <div class="w-full md:w-1/2 mb-4">
+                        <label for="editTimeIn" class="block">Time In:</label>
+                        <input type="text" id="editTimeIn" name="editTimeIn" readonly class="w-full p-2 border rounded-md" />
+                    </div>
+        
+                    <div class="w-full md:w-1/2 mb-4">
+                        <label for="editTimeOut" class="block">Time Out:</label>
+                        <input type="text" id="editTimeOut" name="editTimeOut" readonly class="w-full p-2 border rounded-md" />
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <div class="w-full md:w-1/2 mb-4">
+                        <label for="editMinutesLate" class="block">Minutes Late:</label>
+                        <input type="text" id="editMinutesLate" name="editMinutesLate" readonly class="w-full p-2 border rounded-md" />
+                    </div>
+        
+                    <div class="w-full md:w-1/2 mb-4">
+                        <label for="editRemark" class="block">Remark:</label>
+                        <select id="editRemark" name="editRemark" class="w-full p-2 border rounded-md">
+                            <option value="FULL">Full Day</option>
+                            <option value="HALF">Half Day</option>
+                            <option value="ABSENT">Absent</option>
+                            <option value="LATE">Late</option>
+                            <option value="HOLIDAY">Holiday</option>
+                            <option value="LEAVE">Leave</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="w-full mb-4">
+                    <label for="editExcelFile" class="block">Excel File:</label>
+                    <input type="text" id="editExcelFile" name="editExcelFile" readonly class="w-full p-2 border rounded-md" />
+                </div>
+    
+                <div class="w-full mb-4">
+                    <label for="editGeneratedDate" class="block">Generated Date:</label>
+                    <input type="text" id="editGeneratedDate" name="editGeneratedDate" readonly class="w-full p-2 border rounded-md" />
+                </div>
+
+                <div class="flex justify-end">
+                <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="closeAttendanceEditModal()">Close</button>
+                <button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md ml-2" onclick="handleEditButtonClick()">Save Changes</button>
+                </div>
+        </div>
+    </div>
+    
+    
+<!-- Add Attendance Modal -->
+<div id="addAttendanceModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddAttendanceModal()">&times;</span>
+        <h1>Add Attendance</h1>
+
+        <form method="post" action="{% url 'add_attendance' username=username %}">
+            {% csrf_token %}
+
+            <input name="username" value="{{ username }}">
+        
+            <label for="date">Date:</label>
+            <input type="date" name="date" required>
+            
+            <label for="time_in">Time In:</label>
+            <input type="time" name="time_in" id="time_in" required oninput="calculateMinutesLate()">
+
+            <label for="time_out">Time Out:</label>
+            <input type="time" name="time_out" required>
+
+            <label for="minutes_late">Minutes Late:</label>
+            <input type="number" name="minutes_late" id="minutes_late" required readonly>
+
+            
+            <label for="existing_file">Choose Existing File:</label>
+            <select name="existing_file" id="existing_file">
+                {% for file in existing_files %}
+                    <option value="{{ file.id }}">{{ file.file_name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="remark">Remark:</label>
+            <select name="remark" required>
+                <option value="FULL">Full Day</option>
+                <option value="HALF">Half Day</option>
+                <option value="ABSENT">Absent</option>
+                <option value="LATE">Late</option>
+                <option value="HOLIDAY">Holiday</option>
+                <option value="LEAVE">Leave</option>
+            </select>
+
+        
+            <button type="submit">Save Attendance</button>
+        </form>
+    </div>
+  </div>
+  
+
+{% endblock %}

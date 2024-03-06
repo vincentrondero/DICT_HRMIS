@@ -26,7 +26,13 @@
     {% block content %}
     {% endblock %}
   </main>
-  
+  <div id="logoutModal" class="modal">
+    <div class="modal-content text-right">
+      <p class="mt-10 font-semibold">Are you sure you want to log out?</p>
+      <button id="cancelLogout" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mt-1 ml-auto">Cancel</button>
+      <button id="confirmLogout" class="bg-red-400 hover:bg-red-500 hover:text-white text-gray-200 font-bold py-2 px-4 rounded mt-10 ml-auto">Log out</button>
+    </div>
+  </div>
   
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
@@ -36,10 +42,16 @@
 <script src ={% static "js/manage_employee.js" %}> </script>
 {% block main_js %}
 {% endblock main_js %}
+
 {% block manage_payroll_js %}
 {% endblock manage_payroll_js %}
+
+{% block attendance_js %}
+{% endblock attendance_js %}
+
 {% block calendar_js %}
 {% endblock calendar_js %}
+
 {% block dashboard_js %}
 {% endblock dashboard_js %}
 </body>

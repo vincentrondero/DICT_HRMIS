@@ -15,7 +15,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from datetime import datetime
 import math
-
+from django.db.models import Sum
+from django.db.models import Q
 
 def dashboard_views(request, user_role):
     user_role = request.session.get('role', 'Guest')
@@ -449,28 +450,6 @@ class SaveAttendanceView(View):
             return JsonResponse({'success': False, 'message': str(e)})
 
 
-
-
-def get_latest_attendance(request, username):
-    user = User.objects.get(username=username)
-    print(f"Received username: {username}")
-    attendances = Attendance.objects.filter(employee=user)
-
-    attendance_data = []
-    for attendance in attendances:
-
-        data = {
-            'date': attendance.date,
-            'time_in': attendance.time_in,
-            'time_out': attendance.time_out,
-            'remark': attendance.get_remark_display(),
-        }
-        attendance_data.append(data)
-
-    return JsonResponse({'attendances': attendance_data})
-
-from django.db.models import Sum
-
 def calculate_salary(request, username):
     if request.method == 'GET':
         user = get_object_or_404(User, username=username)
@@ -494,7 +473,7 @@ def calculate_salary(request, username):
 
             date_range = f"{min_date.strftime('%B %d, %Y')} - {max_date.strftime('%B %d, %Y')}"
 
-            full_attendance_count = all_attendances.filter(remark='FULL').count()
+            full_attendance_count = all_attendances.filter(Q(remark='FULL') | Q(remark='HOLIDAY') | Q(remark='LEAVE')).count()
             half_attendance_count = all_attendances.filter(remark='HALF').count()
             absent_attendance_count = all_attendances.filter(remark='ABSENT').count()
             late_attendance_count = all_attendances.filter(remark='LATE').count()
@@ -625,4 +604,160 @@ def activate_payslip(request, username):
             return JsonResponse({'error': f'Error activating payslip: {e}'})
     else:
         return JsonResponse({'error': 'Invalid request method'})
+
+def get_user_attendance(request, user_role, username):
+
+    existing_files = CleansedData.objects.all()
+
+    try:
+        user = User.objects.get(username=username)
+
+        # Get the latest date (without time) for the user
+        latest_date = Attendance.objects.filter(employee=user).aggregate(Max('generated_date'))['generated_date__max']
+
+        # Get all attendance entries with the latest date (disregarding time)
+        attendances = Attendance.objects.filter(employee=user, generated_date__date=latest_date)
+
+        # Create a list to store attendance data
+        attendance_data = []
+
+        # Iterate through each attendance entry and append data to the list
+        for attendance in attendances:
+            data = {
+                'id': attendance.pk,
+                'username': username,
+                'late': attendance.minutes_late,  # Adjust as needed
+                'date': str(attendance.date),
+                'time_in': str(attendance.time_in),
+                'time_out': str(attendance.time_out),
+                'remark': attendance.remark,
+            }
+            attendance_data.append(data)
+
+        # Render the HTML template with the attendance data
+        return render(request, 'HR/attendance.html', {'attendances': attendance_data, 'user_role': user_role, 'username': username, 'existing_files': existing_files})
+    
+    except User.DoesNotExist:
+        return render(request, 'HR/attendance.html', {'error': 'User not found'}, status=404)
+    except Attendance.DoesNotExist:
+        return render(request, 'HR/attendance.html', {'error': 'Attendance not found'}, status=404)
+    except Exception as e:
+        return render(request, 'HR/attendance.html', {'error': str(e)}, status=500)
+
+
+def get_attendance_details(request, attendance_id):
+    try:
+        attendance = Attendance.objects.get(id=attendance_id)
+        # Convert attendance details to a dictionary
+        attendance_data = {
+            'id': attendance.id,
+            'employee': attendance.employee.username,
+            'date': str(attendance.date),
+            'time_in': str(attendance.time_in),
+            'time_out': str(attendance.time_out),
+            'minutes_late': attendance.minutes_late,
+            'remark': attendance.remark,
+            'excel_file': str(attendance.excel_file),  # Include excel_file
+            'generated_date': str(attendance.generated_date), 
+        }
+        return JsonResponse({'success': True, 'data': attendance_data})
+    except Attendance.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Attendance not found'})
+
+
+def update_attendance(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+
+            # Extract data fields
+            employee_username = data.get('employee')
+            date = data.get('date')
+            time_in = data.get('timeIn')
+            time_out = data.get('timeOut')
+
+            # Convert "None" strings to actual None
+            time_in = None if time_in == 'None' else time_in
+            time_out = None if time_out == 'None' else time_out
+
+            minutes_late = data.get('minutesLate')
+            remark = data.get('remark')
+            excel_file_name = data.get('excelFile')  # Assuming excelFile is the name
+
+            # Convert Excel file name to ID
+            try:
+                excel_file_id = CleansedData.objects.get(file_name=excel_file_name).id
+            except CleansedData.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Excel file not found'})
+
+            # Fetch the Attendance instance
+            attendance = Attendance.objects.get(employee__username=employee_username, date=date)
+
+            # Update the fields
+            attendance.time_in = time_in
+            attendance.time_out = time_out
+            attendance.minutes_late = minutes_late
+            attendance.remark = remark
+
+            # Update the excel_file field with the ID
+            attendance.excel_file_id = excel_file_id
+
+            attendance.generated_date = data.get('generatedDate')
+
+            # Save the changes
+            attendance.save()
+
+            # Return a success response
+            return JsonResponse({'success': True})
+        except Exception as e:
+            # Return an error response if there's an exception
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    # Return an error response if the request method is not POST
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+from django.utils import timezone
+
+def add_attendance(request, username):
+    try:
+        # Get the user
+        user = User.objects.get(username=username)
+
+        # Get the last generated date for the user
+        last_generated_date = Attendance.objects.filter(employee=user).latest('generated_date').generated_date
+
+        # Extract form data
+        date = request.POST.get('date')
+        time_in = request.POST.get('time_in')
+        time_out = request.POST.get('time_out')
+        minutes_late = request.POST.get('minutes_late')
+        existing_file_id = request.POST.get('existing_file')
+        remark = request.POST.get('remark')
+
+        # Get the existing file
+        existing_file = CleansedData.objects.get(id=existing_file_id)
+
+        # Create a new attendance record with all the fields
+        new_attendance = Attendance(
+            employee=user,
+            date=date,
+            generated_date=last_generated_date,
+            time_in=time_in,
+            time_out=time_out,
+            minutes_late=minutes_late,
+            excel_file=existing_file,
+            remark=remark,
+            # Add other fields as needed
+        )
+        new_attendance.save()
+
+        return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
+
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'User not found'}, status=404)
+    except CleansedData.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Selected file not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
 
