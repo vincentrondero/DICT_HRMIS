@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from .forms import UserEditForm, UserCreationForm
-from Authentication.models import User
+from Authentication.models import User, Profile
 from .models import CleansedData, Attendance, Payslip, SalaryGrade
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -14,9 +14,10 @@ from django.db.models import Min, Max
 from django.utils.decorators import method_decorator
 from django.views import View
 from datetime import datetime
-import math
+import math 
 from django.db.models import Sum
 from django.db.models import Q
+import base64
 
 def dashboard_views(request, user_role):
     user_role = request.session.get('role', 'Guest')
@@ -56,12 +57,9 @@ def dashboard_views(request, user_role):
     return render(request, 'HR/dashboard.html', context)
 
 
-
-from django.db.models import Max
 def manage_payroll(request, user_role):
     latest_generated_dates = Attendance.objects.values('employee').annotate(latest_date=Max('generated_date'))
-
-    users_with_attendance = User.objects.filter(attendance__generated_date__in=latest_generated_dates.values('latest_date'))
+    users_with_attendance = User.objects.filter(attendance__generated_date__in=latest_generated_dates.values('latest_date')).distinct().order_by('name')
     cleansed_data_list = CleansedData.objects.all()
 
     return render(request, 'HR/manage_payroll.html', {'user_role': user_role, 'cleansed_data_list': cleansed_data_list, 'users_with_attendance': users_with_attendance})
@@ -69,8 +67,8 @@ def manage_payroll(request, user_role):
 
 
 def manage_employee(request, user_role):
-    active_users = User.objects.filter(role='JO', archived=False)
-    archive_users = User.objects.filter(role='JO', archived=True)
+    active_users = User.objects.filter(role='JO', archived=False).order_by('name')
+    archive_users = User.objects.filter(role='JO', archived=True).order_by('name')
     return render(request, 'HR/manage_employee.html' , {'active_users': active_users,  'archive_users':  archive_users, 'user_role': user_role,})
 
 def create_user(request):
@@ -488,7 +486,7 @@ def calculate_salary(request, username):
 
 
             # Calculate absent deduction
-            absent_deduction = round((daily_salary / 22) * absent_attendance_count, 2)
+            absent_deduction = round(daily_salary * absent_attendance_count, 2)
 
             #Calculate absent + late deduction
             pre_deduction = round(( absent_deduction + late_deduction),2)
@@ -605,12 +603,15 @@ def activate_payslip(request, username):
     else:
         return JsonResponse({'error': 'Invalid request method'})
 
-def get_user_attendance(request, user_role, username):
+from django.db.models import Count
 
+def get_user_attendance(request, user_role, username):
     existing_files = CleansedData.objects.all()
 
     try:
         user = User.objects.get(username=username)
+        name = user.name
+        role = user.role
 
         # Get the latest date (without time) for the user
         latest_date = Attendance.objects.filter(employee=user).aggregate(Max('generated_date'))['generated_date__max']
@@ -620,6 +621,12 @@ def get_user_attendance(request, user_role, username):
 
         # Create a list to store attendance data
         attendance_data = []
+
+        # Counters for FULL, Late, and Absent
+        full_count = 0
+        half_count = 0
+        late_count = 0
+        absent_count = 0
 
         # Iterate through each attendance entry and append data to the list
         for attendance in attendances:
@@ -634,15 +641,42 @@ def get_user_attendance(request, user_role, username):
             }
             attendance_data.append(data)
 
-        # Render the HTML template with the attendance data
-        return render(request, 'HR/attendance.html', {'attendances': attendance_data, 'user_role': user_role, 'username': username, 'existing_files': existing_files})
-    
+            # Update counters based on remark
+            if attendance.remark == 'FULL':
+                full_count += 1
+            elif attendance.remark == 'HALF':
+                half_count += 1
+            elif attendance.remark == 'LATE':
+                late_count += 1
+            elif attendance.remark == 'ABSENT':
+                absent_count += 1
+
+        user_profile = Profile.objects.filter(user=user).first()
+        
+        if user_profile and user_profile.profile_picture:
+            user_profile.profile_picture = base64.b64encode(user_profile.profile_picture).decode('utf-8')
+        # Render the HTML template with the attendance data and counts
+        return render(request, 'HR/attendance.html', {
+            'attendances': attendance_data,
+            'user_role': user_role,
+            'username': username,
+            'name': name,
+            'role':role,
+            'user_profile': user_profile,
+            'existing_files': existing_files,
+            'full_count': full_count,
+            'half_count':half_count,
+            'late_count': late_count,
+            'absent_count': absent_count,
+        })
+
     except User.DoesNotExist:
         return render(request, 'HR/attendance.html', {'error': 'User not found'}, status=404)
     except Attendance.DoesNotExist:
         return render(request, 'HR/attendance.html', {'error': 'Attendance not found'}, status=404)
     except Exception as e:
         return render(request, 'HR/attendance.html', {'error': str(e)}, status=500)
+
 
 
 def get_attendance_details(request, attendance_id):

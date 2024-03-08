@@ -223,6 +223,5 @@ function fetchUserAttendance(username) {
     userRole = 'HR'
     console.log('User Role:', userRole);
     window.location.href = `/hr_views/get_user_attendance/${userRole}/${username}/`;
-
 }
 

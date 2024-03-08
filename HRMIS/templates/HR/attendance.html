@@ -2,141 +2,237 @@
 {% load static %}
 {% block attendance_js %}<script src ={% static "js/attendance.js" %}> </script>{% endblock attendance_js %}
 {% block content %}
-    {% if attendances %}
-        <table class="m-2" style="width: 98%;">
-            <thead>
-                <tr>
-                    <th class="px-4 py-2">Date</th>
-                    <th class="px-4 py-2">Time In</th>
-                    <th class="px-4 py-2">Time Out</th>
-                    <th class="px-4 py-2">Minutes Late</th>
-                    <th class="px-4 py-2">Remarks</th>
-                    <th class="px-4 py-2">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for attendance in attendances|dictsort:"date" %}
-                <tr class="">
-                        <td class="text-center align-middle bg-white border border-2" >{{ attendance.date }}</td>
-                        <td class="text-center align-middle">{{ attendance.time_in }}</td>
-                        <td class="text-center align-middle">{{ attendance.time_out }}</td>
-                        <td class="text-center align-middle bg-white border border-2">{{ attendance.late }}</td>
-                        <td class="text-center align-middle">{{ attendance.remark }}</td>
-                        <td class="text-center align-middle"> 
-                            <button class="bg-custom-button1 text-white text-xs p-2 rounded-md" onclick="openAttendanceEditModal('{{ attendance.id }}')">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg" viewBox="0 0 24 24">
-                                    <path d="M7 17.013L11.413 16.998L21.045 7.45799C21.423 7.07999 21.631 6.57799 21.631 6.04399C21.631 5.50999 21.423 5.00799 21.045 4.62999L19.459 3.04399C18.703 2.28799 17.384 2.29199 16.634 3.04099L7 12.583V17.013ZM18.045 4.45799L19.634 6.04099L18.037 7.62299L16.451 6.03799L18.045 4.45799ZM9 13.417L15.03 7.44399L16.616 9.02999L10.587 15.001L9 15.006V13.417Z" fill="#0F5FC2" fill-opacity="0.760784"/>
-                                    <path d="M5 21H19C20.103 21 21 20.103 21 19V10.332L19 12.332V19H8.158C8.132 19 8.105 19.01 8.079 19.01C8.046 19.01 8.013 19.001 7.979 19H5V5H11.847L13.847 3H5C3.897 3 3 3.897 3 5V19C3 20.103 3.897 21 5 21Z" fill="#0F5FC2" fill-opacity="0.760784"/>
-                                </svg>
-                            </button>
-                        </td>
+<div class="flex">
+    <div class="flex-col w-full">  
+        <div class="justify-end m-2">
+            <a href="{% url 'manage_payroll' user_role=user_role %}" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mr-2">Back</a>
+            <button type="button" class="bg-green-300 hover:bg-green-600 text-white font-semibold hover:text-white py-2 px-4 rounded mr-2"  onclick="openAddAttendanceModal()">Add Attendance</button>
+        </div>
+        {% if attendances %}
+        <table class="shadow-custom" style="margin-left: 1%; width: 98%;">
+                <thead class="bg-custom-blue text-white">
+                    <tr>
+                        <th class="py-1">Date</th>
+                        <th class="py-1">Time In</th>
+                        <th class="py-1">Time Out</th>
+                        <th class="py-1">Minutes Late</th>
+                        <th class="py-1">Remarks</th>
+                        <th class="py-1">Actions</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No attendance data available.</p>
-    {% endif %}
-    <div class=" flex justify-end">
-        <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mr-2" onclick="closeAttendanceModal()">Close</button>
-        <button type="button" class="bg-green-300 hover:bg-green-500 text-gray-50 font-semibold hover:text-white py-2 px-4 rounded mr-2"  onclick="openAddAttendanceModal()">Add Attendance</button>
+                </thead>
+                <tbody class="bg-white">
+                    {% for attendance in attendances|dictsort:"date" %}
+                    <tr>
+                            <td class="text-center align-middle pt-2" >{{ attendance.date }}</td>
+                            <td class="text-center align-middle pt-2">{{ attendance.time_in }}</td>
+                            <td class="text-center align-middle pt-2">{{ attendance.time_out }}</td>
+                            <td class="text-center align-middle pt-2">{{ attendance.late }}</td>
+                            <td class="text-center align-middle pt-2" style="color: 
+                                {% if attendance.remark == 'FULL' %}
+                                    black;
+                                {% elif attendance.remark == 'HALF' %}
+                                    orange;
+                                {% elif attendance.remark == 'ABSENT' or attendance.remark == 'LATE' %}
+                                    red;
+                                {% elif attendance.remark == 'HOLIDAY' or attendance.remark == 'LEAVE' %}
+                                    green;
+                                {% endif %}
+                                ">
+                                {{ attendance.remark }}
+                            </td>
+                        
+                            <td class="text-center align-middle pt-2"> 
+                                <button class="bg-custom-button1 text-white text-xs p-2 rounded-md" onclick="openAttendanceEditModal('{{ attendance.id }}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-lg" viewBox="0 0 24 24">
+                                        <path d="M7 17.013L11.413 16.998L21.045 7.45799C21.423 7.07999 21.631 6.57799 21.631 6.04399C21.631 5.50999 21.423 5.00799 21.045 4.62999L19.459 3.04399C18.703 2.28799 17.384 2.29199 16.634 3.04099L7 12.583V17.013ZM18.045 4.45799L19.634 6.04099L18.037 7.62299L16.451 6.03799L18.045 4.45799ZM9 13.417L15.03 7.44399L16.616 9.02999L10.587 15.001L9 15.006V13.417Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                                        <path d="M5 21H19C20.103 21 21 20.103 21 19V10.332L19 12.332V19H8.158C8.132 19 8.105 19.01 8.079 19.01C8.046 19.01 8.013 19.001 7.979 19H5V5H11.847L13.847 3H5C3.897 3 3 3.897 3 5V19C3 20.103 3.897 21 5 21Z" fill="#0F5FC2" fill-opacity="0.760784"/>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No attendance data available.</p>
+        {% endif %}
     </div>
-
-
-    <div id="AttendanceEditModal" class="modal">
-        <div class="modal-content bg-white p-4 rounded-md">
-                <div class="flex space-x-3">
-                    <div class="w-full md:w-1/2 mb-4">
-                        <label for="editEmployee" class="block">Employee:</label>
-                        <input type="text" id="editEmployee" name="editEmployee" readonly class="w-full p-2 border rounded-md" />
-                    </div>
-        
-                    <div class="w-full md:w-1/2 mb-4">
-                        <label for="editDate" class="block">Date:</label>
-                        <input type="text" id="editDate" name="editDate" readonly class="w-full p-2 border rounded-md" />
-                    </div>
+    <div class="flex-col w-1/4 mx-1">
+        <div class="h-1/3 bg-gradient-to-t from-blue-100 to-white shadow-custom rounded-xl text-center flex flex-col items-center justify-center">
+            <div class="h-40 w-40 overflow-hidden rounded-full border-8 border-white bg-white">
+                {% if user_profile.profile_picture %}
+                    <img src="data:image/png;base64,{{ user_profile.profile_picture }}" alt="User Image">
+                {% else %}
+                    <img src="{% static 'images/DICT Logo.png' %}" alt="Image Description">
+                {% endif %}
+            </div>
+            <div class="flex-col">   
+                <div class="font-bold">
+                    {{ name }}
                 </div>
-                <div class="flex space-x-3">
-                    <div class="w-full md:w-1/2 mb-4">
-                        <label for="editTimeIn" class="block">Time In:</label>
-                        <input type="text" id="editTimeIn" name="editTimeIn" readonly class="w-full p-2 border rounded-md" />
-                    </div>
-        
-                    <div class="w-full md:w-1/2 mb-4">
-                        <label for="editTimeOut" class="block">Time Out:</label>
-                        <input type="text" id="editTimeOut" name="editTimeOut" readonly class="w-full p-2 border rounded-md" />
-                    </div>
+                <div>
+                    {{ role }} | {{username}}
                 </div>
-                <div class="flex space-x-3">
-                    <div class="w-full md:w-1/2 mb-4">
-                        <label for="editMinutesLate" class="block">Minutes Late:</label>
-                        <input type="text" id="editMinutesLate" name="editMinutesLate" readonly class="w-full p-2 border rounded-md" />
-                    </div>
-        
-                    <div class="w-full md:w-1/2 mb-4">
-                        <label for="editRemark" class="block">Remark:</label>
-                        <select id="editRemark" name="editRemark" class="w-full p-2 border rounded-md">
-                            <option value="FULL">Full Day</option>
-                            <option value="HALF">Half Day</option>
-                            <option value="ABSENT">Absent</option>
-                            <option value="LATE">Late</option>
-                            <option value="HOLIDAY">Holiday</option>
-                            <option value="LEAVE">Leave</option>
-                        </select>
-                    </div>
+            </div>    
+        </div>        
+        <div class="flex-1 max-w-md bg-blue-600 shadow-custom rounded-xl mt-2">
+            <div class="px-3 flex items-center justify-between">
+                <div class="text-left">
+                    <p class="text-5xl ml-2 text-font-bold text-white">{{full_count}}</p>
+                    <h2 class="text-gray-100">Full Day</h2>
                 </div>
+                <div class="ml-auto">
+                    <svg width="80" height="80" viewBox="0 0 61 61" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.8813 10.1666C16.5701 10.1666 14.3536 11.0847 12.7193 12.719C11.0851 14.3532 10.167 16.5697 10.167 18.8809V42.119C10.167 44.4302 11.0851 46.6467 12.7193 48.2809C14.3536 49.9152 16.5701 50.8333 18.8813 50.8333H42.1194C44.4305 50.8333 46.6471 49.9152 48.2813 48.2809C49.9156 46.6467 50.8337 44.4302 50.8337 42.119V18.8809C50.8337 16.5697 49.9156 14.3532 48.2813 12.719C46.6471 11.0847 44.4305 10.1666 42.1194 10.1666H18.8813ZM41.6953 24.2663L27.1715 38.7902C27.0366 38.9254 26.8763 39.0327 26.6998 39.1059C26.5234 39.1792 26.3342 39.2168 26.1432 39.2168C25.9521 39.2168 25.763 39.1792 25.5865 39.1059C25.4101 39.0327 25.2498 38.9254 25.1149 38.7902L19.3054 32.9806C19.0327 32.7079 18.8794 32.338 18.8794 31.9523C18.8794 31.5667 19.0327 31.1968 19.3054 30.9241C19.5781 30.6513 19.948 30.4981 20.3337 30.4981C20.7193 30.4981 21.0892 30.6513 21.3619 30.9241L26.1432 35.7082L39.6387 22.2098C39.7737 22.0747 39.9341 21.9676 40.1105 21.8945C40.2869 21.8215 40.476 21.7838 40.667 21.7838C40.858 21.7838 41.0471 21.8215 41.2235 21.8945C41.3999 21.9676 41.5602 22.0747 41.6953 22.2098C41.8303 22.3448 41.9374 22.5051 42.0105 22.6816C42.0836 22.858 42.1212 23.0471 42.1212 23.2381C42.1212 23.429 42.0836 23.6181 42.0105 23.7946C41.9374 23.971 41.8303 24.1313 41.6953 24.2663Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+        </div>  
+        <div class="flex-1 max-w-md bg-blue-500 shadow-custom rounded-xl mt-2">
+            <div class="px-3 flex items-center justify-between">
+                <div class="text-left">
+                    <p class="text-5xl ml-2 text-font-bold text-white">{{half_count}}</p>
+                    <h2 class="text-gray-100">Half Day</h2>
+                </div>
+                <div class="ml-auto">
+                    <svg width="80" height="80" viewBox="0 0 61 61" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.125 10C13.7658 10 12.4622 10.54 11.5011 11.5011C10.54 12.4622 10 13.7658 10 15.125L10 45.875C10 47.2342 10.54 48.5378 11.5011 49.4989C12.4622 50.46 13.7658 51 15.125 51H45.875C47.2342 51 48.5378 50.46 49.4989 49.4989C50.46 48.5378 51 47.2342 51 45.875V15.125C51 13.7658 50.46 12.4622 49.4989 11.5011C48.5378 10.54 47.2342 10 45.875 10H15.125ZM39.0946 23.7196L23.7196 39.0946C23.479 39.3352 23.1527 39.4704 22.8125 39.4704C22.4723 39.4704 22.146 39.3352 21.9054 39.0946C21.6648 38.854 21.5296 38.5277 21.5296 38.1875C21.5296 37.8473 21.6648 37.521 21.9054 37.2804L37.2804 21.9054C37.521 21.6648 37.8473 21.5296 38.1875 21.5296C38.5277 21.5296 38.854 21.6648 39.0946 21.9054C39.3352 22.146 39.4704 22.4723 39.4704 22.8125C39.4704 23.1527 39.3352 23.479 39.0946 23.7196Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+        </div>  
+        <div class="flex-1 max-w-md bg-blue-400 shadow-custom rounded-xl mt-2">
+            <div class="px-3 flex items-center justify-between">
+                <div class="text-left">
+                    <p class="text-5xl ml-2 text-font-bold text-white">{{ late_count }}</p>
+                    <h2 class="text-gray-100">Late</h2>
+                </div>
+                <div class="ml-auto">
+                    <svg width="80" height="80" viewBox="0 0 61 61" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.2503 10.1666C13.9021 10.1666 12.6092 10.7022 11.6559 11.6555C10.7026 12.6088 10.167 13.9018 10.167 15.25L10.167 45.75C10.167 47.0981 10.7026 48.3911 11.6559 49.3444C12.6092 50.2977 13.9021 50.8333 15.2503 50.8333H45.7503C47.0985 50.8333 48.3915 50.2977 49.3448 49.3444C50.2981 48.3911 50.8337 47.0981 50.8337 45.75V15.25C50.8337 13.9018 50.2981 12.6088 49.3448 11.6555C48.3915 10.7022 47.0985 10.1666 45.7503 10.1666H15.2503ZM30.5003 20.3333C31.8601 20.3333 32.9251 21.5075 32.7878 22.8623L31.8982 31.7759C31.8684 32.126 31.7081 32.4522 31.4493 32.69C31.1904 32.9277 30.8518 33.0596 30.5003 33.0596C30.1489 33.0596 29.8102 32.9277 29.5514 32.69C29.2925 32.4522 29.1323 32.126 29.1024 31.7759L28.2128 22.8623C28.1809 22.5426 28.2162 22.2198 28.3166 21.9146C28.417 21.6095 28.5802 21.3287 28.7957 21.0905C29.0112 20.8522 29.2743 20.6618 29.5678 20.5314C29.8614 20.4009 30.1791 20.3335 30.5003 20.3333ZM30.5054 35.5833C31.1795 35.5833 31.826 35.8511 32.3026 36.3277C32.7793 36.8044 33.0471 37.4509 33.0471 38.125C33.0471 38.7991 32.7793 39.4455 32.3026 39.9222C31.826 40.3988 31.1795 40.6666 30.5054 40.6666C29.8313 40.6666 29.1848 40.3988 28.7082 39.9222C28.2315 39.4455 27.9637 38.7991 27.9637 38.125C27.9637 37.4509 28.2315 36.8044 28.7082 36.3277C29.1848 35.8511 29.8313 35.5833 30.5054 35.5833Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+        </div>  
+        <div class="flex-1 max-w-md bg-blue-300 shadow-custom rounded-xl mt-2">
+            <div class="px-3 flex items-center justify-between">
+                <div class="text-left">
+                    <p class="text-5xl ml-2 text-font-bold text-white">{{ absent_count }}</p>
+                    <h2 class="text-gray-100">Absent</h2>
+                </div>
+                <div class="ml-auto">
+                    <svg width="80" height="80" viewBox="0 0 61 61" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M47.4448 10.1666H13.5559C12.6571 10.1666 11.7951 10.5237 11.1596 11.1592C10.524 11.7947 10.167 12.6567 10.167 13.5555V47.4444C10.167 48.3432 10.524 49.2052 11.1596 49.8407C11.7951 50.4763 12.6571 50.8333 13.5559 50.8333H47.4448C48.3436 50.8333 49.2055 50.4763 49.8411 49.8407C50.4766 49.2052 50.8337 48.3432 50.8337 47.4444V13.5555C50.8337 12.6567 50.4766 11.7947 49.8411 11.1592C49.2055 10.5237 48.3436 10.1666 47.4448 10.1666ZM41.8658 39.4678C42.0232 39.6252 42.1481 39.8121 42.2333 40.0178C42.3185 40.2235 42.3624 40.444 42.3624 40.6666C42.3624 40.8893 42.3185 41.1097 42.2333 41.3154C42.1481 41.5211 42.0232 41.708 41.8658 41.8654C41.7084 42.0229 41.5215 42.1478 41.3158 42.233C41.1101 42.3182 40.8896 42.362 40.667 42.362C40.4444 42.362 40.2239 42.3182 40.0182 42.233C39.8125 42.1478 39.6256 42.0229 39.4682 41.8654L30.5003 32.8955L21.5325 41.8654C21.2145 42.1834 20.7833 42.362 20.3337 42.362C19.884 42.362 19.4528 42.1834 19.1348 41.8654C18.8169 41.5475 18.6383 41.1163 18.6383 40.6666C18.6383 40.217 18.8169 39.7858 19.1348 39.4678L28.1048 30.5L19.1348 21.5321C18.8169 21.2142 18.6383 20.7829 18.6383 20.3333C18.6383 19.8836 18.8169 19.4524 19.1348 19.1345C19.4528 18.8165 19.884 18.6379 20.3337 18.6379C20.7833 18.6379 21.2145 18.8165 21.5325 19.1345L30.5003 28.1044L39.4682 19.1345C39.7861 18.8165 40.2173 18.6379 40.667 18.6379C41.1166 18.6379 41.5479 18.8165 41.8658 19.1345C42.1838 19.4524 42.3624 19.8836 42.3624 20.3333C42.3624 20.7829 42.1838 21.2142 41.8658 21.5321L32.8958 30.5L41.8658 39.4678Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+        </div> 
+    </div>
+</div>
 
-                <div class="w-full mb-4">
-                    <label for="editExcelFile" class="block">Excel File:</label>
-                    <input type="text" id="editExcelFile" name="editExcelFile" readonly class="w-full p-2 border rounded-md" />
+<div id="AttendanceEditModal" class="modal">
+    <div class="modal-content bg-white p-4 rounded-md">
+        <h1 class="text-2xl font-bold mb-4">Edit Attendance</h1>
+            <div class="flex space-x-3">
+                <div class="w-full md:w-1/2 mb-4">
+                    <label for="editEmployee" class="block">Employee:</label>
+                    <input type="text" id="editEmployee" name="editEmployee" readonly class="w-full p-2 border rounded-md" />
                 </div>
     
-                <div class="w-full mb-4">
-                    <label for="editGeneratedDate" class="block">Generated Date:</label>
-                    <input type="text" id="editGeneratedDate" name="editGeneratedDate" readonly class="w-full p-2 border rounded-md" />
+                <div class="w-full md:w-1/2 mb-4">
+                    <label for="editDate" class="block">Date:</label>
+                    <input type="text" id="editDate" name="editDate" readonly class="w-full p-2 border rounded-md" />
                 </div>
+            </div>
+            <div class="flex space-x-3">
+                <div class="w-full md:w-1/2 mb-4">
+                    <label for="editTimeIn" class="block">Time In:</label>
+                    <input type="text" id="editTimeIn" name="editTimeIn" readonly class="w-full p-2 border rounded-md" />
+                </div>
+    
+                <div class="w-full md:w-1/2 mb-4">
+                    <label for="editTimeOut" class="block">Time Out:</label>
+                    <input type="text" id="editTimeOut" name="editTimeOut" readonly class="w-full p-2 border rounded-md" />
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <div class="w-full md:w-1/2 mb-4">
+                    <label for="editMinutesLate" class="block">Minutes Late:</label>
+                    <input type="text" id="editMinutesLate" name="editMinutesLate" readonly class="w-full p-2 border rounded-md" />
+                </div>
+    
+                <div class="w-full md:w-1/2 mb-4">
+                    <label for="editRemark" class="block">Remark:</label>
+                    <select id="editRemark" name="editRemark" class="w-full p-2 border rounded-md">
+                        <option value="FULL">Full Day</option>
+                        <option value="HALF">Half Day</option>
+                        <option value="ABSENT">Absent</option>
+                        <option value="LATE">Late</option>
+                        <option value="HOLIDAY">Holiday</option>
+                        <option value="LEAVE">Leave</option>
+                    </select>
+                </div>
+            </div>
 
-                <div class="flex justify-end">
-                <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="closeAttendanceEditModal()">Close</button>
-                <button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md ml-2" onclick="handleEditButtonClick()">Save Changes</button>
-                </div>
-        </div>
+            <div class="w-full mb-4">
+                <label for="editExcelFile" class="block">Excel File:</label>
+                <input type="text" id="editExcelFile" name="editExcelFile" readonly class="w-full p-2 border rounded-md" />
+            </div>
+
+            <div class="w-full mb-4">
+                <label for="editGeneratedDate" class="block">Generated Date:</label>
+                <input type="text" id="editGeneratedDate" name="editGeneratedDate" readonly class="w-full p-2 border rounded-md" />
+            </div>
+
+            <div class="flex justify-end">
+            <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="closeAttendanceEditModal()">Close</button>
+            <button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md ml-2" onclick="handleEditButtonClick()">Save Changes</button>
+            </div>
     </div>
+</div>
     
     
 <!-- Add Attendance Modal -->
 <div id="addAttendanceModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeAddAttendanceModal()">&times;</span>
-        <h1>Add Attendance</h1>
+    <div class="modal-content bg-white p-4 rounded-md">
+        <h1 class="text-2xl font-bold mb-4">Add Attendance</h1>
 
-        <form method="post" action="{% url 'add_attendance' username=username %}">
+        <form method="post" action="{% url 'add_attendance' username=username %}" class="space-y-4">
             {% csrf_token %}
 
-            <input name="username" value="{{ username }}">
-        
-            <label for="date">Date:</label>
-            <input type="date" name="date" required>
-            
-            <label for="time_in">Time In:</label>
-            <input type="time" name="time_in" id="time_in" required oninput="calculateMinutesLate()">
+            <input name="username" value="{{ username }}" type="hidden">
 
-            <label for="time_out">Time Out:</label>
-            <input type="time" name="time_out" required>
+                <div class="w-full">
+                    <label for="date" class="block">Date:</label>
+                    <input type="date" name="date" required class="w-full p-2 border rounded-md">
+                </div>
 
-            <label for="minutes_late">Minutes Late:</label>
-            <input type="number" name="minutes_late" id="minutes_late" required readonly>
 
-            
-            <label for="existing_file">Choose Existing File:</label>
-            <select name="existing_file" id="existing_file">
+            <div class="flex space-x-3">
+                <div class="w-full md:w-1/2">
+                    <label for="time_out" class="block">Time Out:</label>
+                    <input type="time" name="time_out" required class="w-full p-2 border rounded-md">
+                </div>
+
+                <div class="w-full md:w-1/2">
+                    <label for="time_in" class="block">Time In:</label>
+                    <input type="time" name="time_in" id="time_in" required oninput="calculateMinutesLate()" class="w-full p-2 border rounded-md">
+                </div>
+            </div>
+            <div class="w-full">
+                <label for="minutes_late" class="block">Minutes Late:</label>
+                <input type="number" name="minutes_late" id="minutes_late" required readonly class="w-full p-2 border rounded-md">
+            </div>
+
+            <label for="existing_file" class="block">Choose Existing File:</label>
+            <select name="existing_file" id="existing_file" class="w-full p-2 border rounded-md">
                 {% for file in existing_files %}
                     <option value="{{ file.id }}">{{ file.file_name }}</option>
                 {% endfor %}
             </select>
 
-            <label for="remark">Remark:</label>
-            <select name="remark" required>
+            <label for="remark" class="block">Remark:</label>
+            <select name="remark" required class="w-full p-2 border rounded-md">
                 <option value="FULL">Full Day</option>
                 <option value="HALF">Half Day</option>
                 <option value="ABSENT">Absent</option>
@@ -144,12 +240,13 @@
                 <option value="HOLIDAY">Holiday</option>
                 <option value="LEAVE">Leave</option>
             </select>
-
-        
-            <button type="submit">Save Attendance</button>
+            <div class="flex justify-end">
+            <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="closeAddAttendanceModal()">Close</button>
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md ml-2">Save Attendance</button>
+            </div>
         </form>
     </div>
-  </div>
-  
+</div>
+
 
 {% endblock %}
