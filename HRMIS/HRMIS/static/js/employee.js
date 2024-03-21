@@ -75,21 +75,19 @@ function closePayrollModal() {
 
 function openPayslipDetailsModal(payslipId) {
     var payslipDetailsId = `payslipDetailsContent${payslipId}`;
-    document.getElementById('payrollModal').style.display = 'none';
-
-    var payslipDetailsContainers = document.querySelectorAll('.payslip-details');
-    payslipDetailsContainers.forEach(function(container) {
-        container.style.display = 'none';
-    });
-
     var selectedPayslipDetails = document.getElementById(payslipDetailsId);
+    var payslipDetailsContainer = document.getElementById('payslipDetailsContainer');
+
     if (selectedPayslipDetails) {
-        selectedPayslipDetails.style.display = 'block';
+        payslipDetailsContainer.innerHTML = selectedPayslipDetails.innerHTML;
+
         document.getElementById('payslipDetailsModal').style.display = 'block';
     } else {
         console.error('Payslip details element not found. ID:', payslipDetailsId);
     }
 }
+
+
 
 function goBackToMainModal() {
     document.getElementById('payslipDetailsModal').style.display = 'none';

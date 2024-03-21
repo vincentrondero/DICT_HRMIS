@@ -17,6 +17,7 @@ from datetime import datetime
 import math 
 from django.db.models import Sum
 from django.db.models import Q
+import calendar
 import base64
 
 def dashboard_views(request, user_role):
@@ -56,13 +57,31 @@ def dashboard_views(request, user_role):
 
     return render(request, 'HR/dashboard.html', context)
 
-
 def manage_payroll(request, user_role):
     latest_generated_dates = Attendance.objects.values('employee').annotate(latest_date=Max('generated_date'))
     users_with_attendance = User.objects.filter(attendance__generated_date__in=latest_generated_dates.values('latest_date')).distinct().order_by('name')
     cleansed_data_list = CleansedData.objects.all()
 
-    return render(request, 'HR/manage_payroll.html', {'user_role': user_role, 'cleansed_data_list': cleansed_data_list, 'users_with_attendance': users_with_attendance})
+    last_attendance = Attendance.objects.order_by('-generated_date').first()
+    if last_attendance:
+        month = last_attendance.date.month
+        # Get the payslips with a date range that matches the month
+        relevant_payslips = Payslip.objects.filter(
+            Q(date_range__icontains=f"{calendar.month_name[month][:3]}") &  # Match the month abbreviation
+            Q(date_range__icontains=f"{month:02d}")  # Ensure leading zero for single-digit months
+        )
+        
+        if relevant_payslips.exists():
+            # Create a set of usernames for users with relevant payslips
+            users_with_payslip = set(relevant_payslips.values_list('user__username', flat=True))
+        else:
+            users_with_payslip = set()  # Empty set if no relevant payslips found
+    else:
+        users_with_payslip = set()  # Empty set if no attendance data
+
+    print(users_with_payslip)
+    return render(request, 'HR/manage_payroll.html', {'user_role': user_role, 'cleansed_data_list': cleansed_data_list, 'users_with_attendance': users_with_attendance, 'users_with_payslip': users_with_payslip})
+
 
 
 
@@ -256,7 +275,7 @@ def upload_and_cleanse(request):
 
         # Generate the output Excel file name based on the formatted date range
         date_range = f"{formatted_start_date}-{formatted_end_date}"
-        output_excel = f'{date_range}.xlsx'
+        output_excel = f'attendance_{date_range}.xlsx'
 
         # Merge user details and attendance details by row index
         merged_df = pd.concat([users_df, attendance_df], axis=1)
