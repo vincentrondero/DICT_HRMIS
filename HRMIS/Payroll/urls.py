@@ -20,8 +20,6 @@ urlpatterns = [
     path('get_user_attendance/<str:user_role>/<str:username>/', views.get_user_attendance, name='get_user_attendance'),
     path('get_attendance_details/<int:attendance_id>/', views.get_attendance_details, name='get_attendance_details'),
     path('update_attendance/', views.update_attendance, name='update_attendance'),
-    path('hr_views/add_attendance/<str:username>/', views.add_attendance, name='add_attendance'),
-
-    
+    path('add_attendance/<str:username>/', views.add_attendance, name='add_attendance'),
 ]    
 

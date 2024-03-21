@@ -83,8 +83,6 @@ def manage_payroll(request, user_role):
     return render(request, 'HR/manage_payroll.html', {'user_role': user_role, 'cleansed_data_list': cleansed_data_list, 'users_with_attendance': users_with_attendance, 'users_with_payslip': users_with_payslip})
 
 
-
-
 def manage_employee(request, user_role):
     active_users = User.objects.filter(role='JO', archived=False).order_by('name')
     archive_users = User.objects.filter(role='JO', archived=True).order_by('name')
@@ -770,47 +768,52 @@ def update_attendance(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 from django.utils import timezone
-
 def add_attendance(request, username):
-    try:
-        # Get the user
-        user = User.objects.get(username=username)
+    if request.method == "POST":
+        try:
+            # Get the data from the AJAX request body
+            data = json.loads(request.body)
+            formData = data['formData']
 
-        # Get the last generated date for the user
-        last_generated_date = Attendance.objects.filter(employee=user).latest('generated_date').generated_date
+            # Get the user
+            user = User.objects.get(username=username)
 
-        # Extract form data
-        date = request.POST.get('date')
-        time_in = request.POST.get('time_in')
-        time_out = request.POST.get('time_out')
-        minutes_late = request.POST.get('minutes_late')
-        existing_file_id = request.POST.get('existing_file')
-        remark = request.POST.get('remark')
+            # Get the last generated date for the user
+            last_generated_date = Attendance.objects.filter(employee=user).latest('generated_date').generated_date
 
-        # Get the existing file
-        existing_file = CleansedData.objects.get(id=existing_file_id)
+            # Extract form data
+            date = formData.get('date')
+            time_in = formData.get('time_in')
+            time_out = formData.get('time_out')
+            minutes_late = formData.get('minutes_late')
+            existing_file_id = formData.get('existing_file')
+            remark = formData.get('remark')
 
-        # Create a new attendance record with all the fields
-        new_attendance = Attendance(
-            employee=user,
-            date=date,
-            generated_date=last_generated_date,
-            time_in=time_in,
-            time_out=time_out,
-            minutes_late=minutes_late,
-            excel_file=existing_file,
-            remark=remark,
-            # Add other fields as needed
-        )
-        new_attendance.save()
+            # Get the existing file
+            existing_file = CleansedData.objects.get(id=existing_file_id)
 
-        return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
+            # Create a new attendance record with all the fields
+            new_attendance = Attendance(
+                employee=user,
+                date=date,
+                generated_date=last_generated_date,
+                time_in=time_in,
+                time_out=time_out,
+                minutes_late=minutes_late,
+                excel_file=existing_file,
+                remark=remark,
+                # Add other fields as needed
+            )
+            new_attendance.save()
 
-    except User.DoesNotExist:
-        return JsonResponse({'success': False, 'message': 'User not found'}, status=404)
-    except CleansedData.DoesNotExist:
-        return JsonResponse({'success': False, 'message': 'Selected file not found'}, status=404)
-    except Exception as e:
-        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+            return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
 
+        except User.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'User not found'}, status=404)
+        except CleansedData.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Selected file not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)

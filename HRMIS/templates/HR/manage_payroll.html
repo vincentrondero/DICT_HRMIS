@@ -97,13 +97,37 @@
                 </div>
                 <h2 class="text-xl font-semibold text-gray-800 flex justify-center pb-3">Import Data</h2>
             </label>
-            <div class="flex justify-end">
+            <div id="progress-bar-container" class="w-full bg-gray-200 rounded-full dark:bg-gray-700 hidden">
+                <div id="progress-bar" class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: 0%">0%</div>
+            </div>
+            <div class="flex justify-end space-x-4 mt-4">
                 <button type="button" class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onclick="closeImportModal()">Close</button>
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md ml-2">Save</button>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md ml-2" onclick="handleSaveButtonClick('{{ cleansedDataId }}')" id="save-button">Save</button>
             </div>
         </form>
     </div>
-</div>   
+</div> 
+<div id="DataSuccessModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-md w-96 shadow-md">
+        <button id="close-button" class="absolute top-0 right-0 m-4 text-gray-500">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-blue-500 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.55 18L3.85 12.3L5.275 10.875L9.55 15.15L18.725 5.975L20.15 7.4L9.55 18Z" fill="#0F5FC2"/>
+            </svg>
+            <h2 class="text-xl font-semibold text-gray-800">Successful</h2>
+        </div>
+        <div class="mb-4">
+            <p class="text-gray-700">The data has been imported successfully.</p>
+        </div>
+        <div class="flex justify-center">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-md" id="close-modal-button">Close</button>
+        </div>
+    </div>
+</div>
 
 <div id="cleansedDataModal" class="modal fixed top-0 left-0 hidden">
     <div class="modal-dialog flex items-center justify-center min-h-full">

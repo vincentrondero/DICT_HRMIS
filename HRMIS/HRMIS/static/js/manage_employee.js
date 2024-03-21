@@ -187,6 +187,7 @@ function openEditModal(userId) {
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');  
     xhr.send();
 }
+
 // SAVE EDIT MODAL
 function saveChanges() {
     var userId = currentUserId;
@@ -208,8 +209,9 @@ function saveChanges() {
             var responseData = JSON.parse(xhr.responseText);
             if (responseData.success) {
                 console.log('Changes saved successfully!');
-                location.reload();
-                closeEditModal();
+                EditSuccessModal(); 
+                closeEditModal(); 
+                
             } else {
                 console.error('Error saving changes:', responseData.errors);
             }
@@ -228,6 +230,22 @@ function saveChanges() {
 
     xhr.send(JSON.stringify(formData));
 }
+
+
+// Function to display the edit success modal
+function EditSuccessModal() {
+    document.getElementById('editSuccessModal').classList.remove('hidden');
+}
+// Function to close the edit success modal
+function closeEditSuccessModal() {
+    document.getElementById('editSuccessModal').classList.add('hidden');
+    location.reload();
+}
+
+// Function to close the edit modal
+function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+}
 // POPULATE EDIT MODAL
 function populateEditModal(userData) {
     if (userData) {
@@ -240,26 +258,21 @@ function populateEditModal(userData) {
         console.error('Invalid user data received.');
     }
 }
-// CLOSING EDIT MODAL
-function closeEditModal() {
-    document.getElementById('editModal').classList.add('hidden');
-}
-
-
 //NEW USER JS
 // OPEN NEW USER MODAL
 function openNewUserModal() {
     var newUserModal = document.getElementById('newUserModal');
     newUserModal.classList.remove('hidden');
 }
+
 // CLOSING NEW USER MODAL
 function closeNewUserModal() {
     var newUserModal = document.getElementById('newUserModal');
     newUserModal.classList.add('hidden');
 }
+
 // SAVING NEW USER
 function saveNewUser() {
-
     const username = document.getElementById('newUsernameInput').value;
     const password = document.getElementById('newPasswordInput').value;
     const name = document.getElementById('newNameInput').value;
@@ -280,14 +293,26 @@ function saveNewUser() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
                 console.log('New user saved successfully!');
-                location.reload();
-                closeNewUserModal();
+                displaySuccessModal(); // Display the success modal
+                closeNewUserModal(); // Close the new user modal
+                
             } else {
                 console.error('Error saving new user:', xhr.responseText);
             }
         }
     };
     xhr.send(formData);
+}
+
+// Function to display the success modal
+function displaySuccessModal() {
+    document.getElementById('newUserSuccessModal').classList.remove('hidden');
+}
+
+// Function to close the success modal
+function closeNewUserSuccessModal() {
+    document.getElementById('newUserSuccessModal').classList.add('hidden');
+    location.reload();
 }
 
 function showActiveSearch() {

@@ -225,3 +225,68 @@ function fetchUserAttendance(username) {
     window.location.href = `/hr_views/get_user_attendance/${userRole}/${username}/`;
 }
 
+// Function to show the progress bar
+function showProgressBar() {
+    document.getElementById('progress-bar-container').style.display = 'inline-block';
+}
+
+// Function to update the progress bar
+function updateProgressBar(progress) {
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = progress + '%';
+    progressBar.innerText = progress + '%';
+    console.log('Progress:', progress);
+}
+
+// Function to simulate the import process
+function simulateImportProcess(cleansedDataId) {
+    let progress = 0;
+    const targetProgress = 100;
+    const duration = 80;
+    const frames = 100;
+    const increment = targetProgress / frames;
+
+    const interval = setInterval(() => {
+        progress += increment;
+        if (progress >= targetProgress) {
+            clearInterval(interval);
+            progress = targetProgress;
+            updateProgressBar(progress);
+            showDataSuccessModal();
+        } else {
+            updateProgressBar(progress);
+        }
+    }, duration / frames);
+}
+
+// Function to handle the save button click
+function handleSaveButtonClick(cleansedDataId) {
+    const fileInput = document.getElementById('file-upload');
+    if (fileInput.files.length > 0) {
+        showProgressBar();
+        simulateImportProcess(cleansedDataId);
+    }
+}
+
+// Function to show the Import Data Success Modal
+function showDataSuccessModal() {
+    const successModal = document.getElementById('DataSuccessModal');
+    successModal.style.display = 'flex';
+}
+
+// Function to hide the Import Data Success Modal
+function hideDataSuccessModal() {
+    const successModal = document.getElementById('DataSuccessModal');
+    successModal.style.display = 'none';
+}
+
+// Event listener for the close button
+document.getElementById('close-modal-button').addEventListener('click', function() {
+    hideDataSuccessModal();
+});
+
+// Function to enable/disable the Save button based on file selection
+document.getElementById('file-upload').addEventListener('change', function() {
+    const saveButton = document.getElementById('save-button');
+    saveButton.disabled = this.files.length === 0;
+});
