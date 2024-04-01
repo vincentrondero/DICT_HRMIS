@@ -494,8 +494,9 @@ def calculate_salary(request, username):
             late_attendance_count = all_attendances.filter(remark='LATE').count()
 
             full_day_salary = daily_salary * full_attendance_count
+            absent_day_salary = daily_salary * absent_attendance_count
             half_day_salary = (daily_salary * half_attendance_count) / 2
-            monthly_salary = full_day_salary + half_day_salary
+            monthly_salary = full_day_salary + half_day_salary + absent_day_salary
 
             # Calculate late deduction
             total_late_minutes = all_attendances.aggregate(Sum('minutes_late'))['minutes_late__sum']
@@ -513,7 +514,7 @@ def calculate_salary(request, username):
             premium =round( (0.2 * basic_salary ) , 4) 
 
             # Calculate gross pay
-            gross_pay = basic_salary + premium
+            gross_pay = round(basic_salary + premium, 4)
 
             # Calculate net before tax
             net_before_tax = gross_pay - (late_deduction + absent_deduction)

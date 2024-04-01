@@ -96,7 +96,24 @@ function goBackToMainModal() {
 
 function closePayslipDetailsModal() {
     document.getElementById('payslipDetailsModal').style.display = 'none';
+    document.getElementById('payrollModal').style.display = 'none';
 }
 
+function openAttendanceModal() {
+    // Get the modal element
+    var modal = document.getElementById("attendanceModal");
+    
+    // Show the modal
+    modal.style.display = 'block';
+    modal.style.remove = 'hidden';
+}
+
+function closeAttendanceModal() {
+    // Get the modal element
+    var modal = document.getElementById("attendanceModal");
+    
+    // Hide the modal
+    modal.style.display = 'none';
+}
 
 
