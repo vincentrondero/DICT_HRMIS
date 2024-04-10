@@ -163,6 +163,7 @@ def edit_user(request, user_pk_id):
                 'name': user.name,
                 'role': user.role,
                 'salary_grade': user.salary_grade,
+                'cooperative_member': user.cooperative_member,
             }
             return JsonResponse(user_data)
         else:
@@ -342,11 +343,13 @@ class SaveAttendanceView(View):
 
     def calculate_remark(self, time_in, time_out, date):
         minutes_late = 0 
+        undertime_hours = 0
+        undertime_minutes = 0
         if pd.isna(time_in) or pd.isna(time_out):
             # Treat as half day if either time entry is NaN
-            return 'HALF', 0
+            return 'HALF', 0 , 0 , 0 
         elif not time_in or not time_out:
-            return 'ABSENT', 0
+            return 'ABSENT', 0, 0, 0
         else:
             # Convert time_in and time_out to datetime.time objects with format %H:%M
             time_in = datetime.strptime(str(time_in), "%H:%M").time()
@@ -360,24 +363,28 @@ class SaveAttendanceView(View):
                 if date.weekday() == 0:  # Monday
                     if time_in > datetime.strptime("08:00", "%H:%M").time():
                         minutes_late = (time_in.hour - 8) * 60 + time_in.minute
-                        return 'LATE', minutes_late
+                        return 'LATE', minutes_late,0 ,0 
                 elif 1 <= date.weekday() <= 4:  # Tuesday to Friday
                     if time_in > datetime.strptime("09:00", "%H:%M").time():
                         minutes_late = (time_in.hour - 9) * 60 + time_in.minute
-                        return 'LATE', minutes_late
-                return 'FULL', 0
+                        return 'LATE', minutes_late,0 ,0
+                return 'FULL', 0, 0, 0
             elif 4 <= hours_worked < 8:
                 if date.weekday() == 0:  # Monday
+                    undertime_hours = 8 - hours_worked
+                    undertime_minutes = 60 - (abs((datetime.combine(date, time_out) - datetime.combine(date, time_in)).seconds) % 3600) // 60
                     if time_in > datetime.strptime("12:00", "%H:%M").time():
                         minutes_late = (time_in.hour - 12) * 60 + time_in.minute
-                        return 'LATE', minutes_late
+                        return 'LATE', minutes_late, undertime_hours, undertime_minutes
                 elif 1 <= date.weekday() <= 4:  # Tuesday to Friday
+                    undertime_hours = 8 - hours_worked
+                    undertime_minutes = 60 - (abs((datetime.combine(date, time_out) - datetime.combine(date, time_in)).seconds) % 3600) // 60
                     if time_in > datetime.strptime("12:00", "%H:%M").time():
                         minutes_late = (time_in.hour - 12) * 60 + time_in.minute
-                        return 'LATE', minutes_late
-                return 'HALF', 0
+                        return 'LATE', minutes_late, undertime_hours, undertime_minutes
+                return 'HALF', 0, undertime_hours, undertime_minutes
             else:
-                return 'ABSENT', 0
+                return 'ABSENT', 0 , 0 , 0
 
 
 
@@ -440,7 +447,7 @@ class SaveAttendanceView(View):
                         print(f"Processing row {index + 2} (Employee ID {employee_id}), Date: {date}, Time In: {time_in}, Time Out: {time_out}")
 
                         # Calculate the remark based on time_in, time_out, and date
-                        remark, minutes_late = self.calculate_remark(time_in, time_out, date)
+                        remark, minutes_late, undertime_hours, undertime_minutes = self.calculate_remark(time_in, time_out, date)
 
                         # Check if an attendance record already exists for the user and date
                         existing_attendance = Attendance.objects.filter(employee=user, date=date).first()
@@ -456,7 +463,9 @@ class SaveAttendanceView(View):
                                 time_out=time_out if time_out else None,
                                 excel_file=cleansed_data,
                                 remark=remark,
-                                minutes_late=minutes_late
+                                minutes_late=minutes_late,
+                                undertime_hours=undertime_hours,
+                                undertime_minutes=undertime_minutes
                             )
 
             return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
@@ -497,7 +506,15 @@ def calculate_salary(request, username):
             absent_day_salary = daily_salary * absent_attendance_count
             half_day_salary = (daily_salary * half_attendance_count) / 2
             monthly_salary = full_day_salary + half_day_salary + absent_day_salary
+            
+            cooperative_deduction = 0
+            member_status = 0
 
+            if user.cooperative_member:
+                coopertive_member_status = 1
+                member_status = coopertive_member_status
+                cooperative_fee_per_month = 50 
+                cooperative_deduction = cooperative_fee_per_month
             # Calculate late deduction
             total_late_minutes = all_attendances.aggregate(Sum('minutes_late'))['minutes_late__sum']
             late_deduction = round((daily_salary / 22) / 480 * total_late_minutes, 2)
@@ -524,7 +541,7 @@ def calculate_salary(request, username):
             tax_3_percent =round(( 0.03 * net_before_tax),2)
 
             # Calculate total deduction
-            total_deduction = round( late_deduction + absent_deduction + tax_2_percent + tax_3_percent,4)
+            total_deduction = round( late_deduction + absent_deduction + tax_2_percent + tax_3_percent + cooperative_deduction,4)
 
             # Calculate total net pay
             total_net_pay =round( gross_pay - total_deduction, 4)
@@ -541,6 +558,8 @@ def calculate_salary(request, username):
                 'total_late_minutes': total_late_minutes,
                 'late_attendance_count':late_attendance_count,
                 'late_deduction': late_deduction,
+                'cooperative_deduction':cooperative_deduction,
+                'member_status':member_status,
                 'absent_count': absent_attendance_count,
                 'absent_deduction': absent_deduction,
                 'pre_deduction': pre_deduction,
@@ -586,6 +605,8 @@ def activate_payslip(request, username):
             date_range = salary_data.get('date_range')
             total_net_pay = salary_data.get('total_net_pay')
             current_date = salary_data.get('current_date')
+            cooperative_deduction = salary_data.get('cooperative_deduction') 
+            member_status = salary_data.get('member_status')  
 
             # Get the user object
             user = get_object_or_404(User, username=username)
@@ -611,7 +632,9 @@ def activate_payslip(request, username):
                 date_range=date_range,
                 total_net_pay=total_net_pay,
                 current_date=current_date,
-                activated=True
+                activated=True,
+                cooperative_deduction=cooperative_deduction, 
+                member_status=member_status 
             )
 
             return JsonResponse({'success': 'Payslip activated successfully'})

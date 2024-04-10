@@ -17,6 +17,8 @@ class Attendance(models.Model):
     time_in = models.TimeField(null=True)
     time_out = models.TimeField(null=True)
     minutes_late = models.IntegerField(null=True, blank=True)
+    undertime_hours = models.IntegerField(null=True, blank=True)
+    undertime_minutes = models.IntegerField(null=True, blank=True)
     excel_file = models.ForeignKey(CleansedData, on_delete=models.CASCADE, null=True, blank=True)
     
     REMARK_CHOICES = [
@@ -57,7 +59,8 @@ class Payslip(models.Model):
     current_date = models.DateField(default=timezone.now)
     activated_date = models.DateTimeField(default=timezone.now)
     activated = models.BooleanField(default=True)
-
+    cooperative_deduction = models.FloatField(default=0.0)
+    member_status = models.IntegerField(default=0)
     def __str__(self):
         return f"{self.user.username} - {self.activated}"
 

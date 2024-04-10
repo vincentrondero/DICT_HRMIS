@@ -107,6 +107,7 @@ function calculateSalary(username) {
             console.log(data);
             $('#dailySalary').text(data.daily_salary);
             $('#basic_salary').text(data.basic_salary);
+            $('#cooperative_deduction').text(data.cooperative_deduction);
             $('#premium').text(data.premium);
             $('#another_gross_pay').text(data.gross_pay);
             $('#gross_pay').text(data.gross_pay);
@@ -118,6 +119,7 @@ function calculateSalary(username) {
             $('#employeeId').text(username);late_count
             $('#late_count').text(data.late_attendance_count);
             $('#late_deduction').text(data.late_deduction);
+            $('#member_status').text(data.member_status);
             $('#absent_deduction').text(data.absent_deduction);
             $('#pre_deduction').text(data.pre_deduction);
             $('#total_deduction').text(data.total_deduction);

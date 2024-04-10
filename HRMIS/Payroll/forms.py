@@ -6,10 +6,11 @@ from .models import CleansedData
 
 class UserCreationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
+    cooperative_member = forms.BooleanField(label='Cooperative Member', required=False)
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'name', 'role', 'salary_grade']
+        fields = ['username', 'password', 'name', 'role', 'salary_grade','cooperative_member']
         widgets = {
             'password': forms.PasswordInput(),
         }
@@ -26,6 +27,8 @@ class UserCreationForm(forms.ModelForm):
         user.password = make_password(self.cleaned_data['password'])
 
         user.archived = False
+        # Save the cooperative member status
+        user.cooperative_member = self.cleaned_data['cooperative_member']
 
         if commit:
             user.save()
@@ -36,7 +39,7 @@ class UserCreationForm(forms.ModelForm):
 class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'name', 'role', 'salary_grade']
+        fields = ['username', 'name', 'role', 'salary_grade', 'cooperative_member']
         exclude = ['password']
 
     def save(self, commit=True):
