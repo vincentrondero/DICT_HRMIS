@@ -10,7 +10,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'name', 'role', 'salary_grade','cooperative_member']
+        fields = ['username', 'password', 'name', 'role', 'salary_grade','cooperative_member','category']
         widgets = {
             'password': forms.PasswordInput(),
         }
@@ -39,7 +39,7 @@ class UserCreationForm(forms.ModelForm):
 class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'name', 'role', 'salary_grade', 'cooperative_member']
+        fields = ['username', 'name', 'role', 'salary_grade', 'cooperative_member','category']
         exclude = ['password']
 
     def save(self, commit=True):

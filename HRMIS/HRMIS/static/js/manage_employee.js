@@ -225,7 +225,8 @@ function saveChanges() {
         name: document.getElementById('nameInput').value,
         role: document.getElementById('roleInput').value,
         salary_grade: document.getElementById('salaryInput').value,
-        cooperative_member: document.getElementById('cooperativeMemberInput').checked 
+        cooperative_member: document.getElementById('cooperativeMemberInput').checked,
+        category: document.getElementById('categoryInput').value,
     };
     console.log(formData);
 
@@ -255,7 +256,7 @@ function populateEditModal(userData) {
         document.getElementById('roleInput').value = userData.role;
         document.getElementById('salaryInput').value = userData.salary_grade;
         document.getElementById('cooperativeMemberInput').checked = userData.cooperative_member;
-    
+        document.getElementById('categoryInput').value = userData.category;
     } else {
         console.error('Invalid user data received.');
     }
@@ -281,6 +282,7 @@ function saveNewUser() {
     const role = document.getElementById('newRoleInput').value;
     const salary_grade = document.getElementById('newSalaryInput').value;
     const cooperative_member = document.getElementById('newCooperativeMemberInput').checked;
+    const category = document.getElementById('newCategoryInput').value;
 
     const formData = new FormData();
     formData.append('username', username);
@@ -289,6 +291,7 @@ function saveNewUser() {
     formData.append('role', role);
     formData.append('salary_grade', salary_grade);
     formData.append('cooperative_member', cooperative_member);
+    formData.append('category', category);
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '/hr_views/create_user/');

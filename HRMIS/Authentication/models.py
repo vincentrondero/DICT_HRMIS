@@ -16,7 +16,8 @@ class User(models.Model):
     salary_grade = models.IntegerField()
     date_created = models.DateField(auto_now_add=True)
     archived = models.BooleanField(default=False)
-    cooperative_member = models.BooleanField(default=False) 
+    cooperative_member = models.BooleanField(default=False)
+    category = models.CharField(max_length=3, choices=[('TOD', 'TOD'), ('FOD', 'FOD')], default='TOD') 
 
     def save(self, *args, **kwargs):
         if self.archived:

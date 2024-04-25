@@ -164,6 +164,7 @@ def edit_user(request, user_pk_id):
                 'role': user.role,
                 'salary_grade': user.salary_grade,
                 'cooperative_member': user.cooperative_member,
+                'category': user.category,
             }
             return JsonResponse(user_data)
         else:
@@ -730,6 +731,8 @@ def get_attendance_details(request, attendance_id):
             'date': str(attendance.date),
             'time_in': str(attendance.time_in),
             'time_out': str(attendance.time_out),
+            'undertime_hours': attendance.undertime_hours,
+            'undertime_minutes': attendance.undertime_minutes,
             'minutes_late': attendance.minutes_late,
             'remark': attendance.remark,
             'excel_file': str(attendance.excel_file),  # Include excel_file
@@ -756,6 +759,8 @@ def update_attendance(request):
             time_out = None if time_out == 'None' else time_out
 
             minutes_late = data.get('minutesLate')
+            undertime_hours = data.get('undertimeHours')
+            undertime_minutes = data.get('undertimeMinutes')
             remark = data.get('remark')
             excel_file_name = data.get('excelFile')  # Assuming excelFile is the name
 
@@ -772,6 +777,8 @@ def update_attendance(request):
             attendance.time_in = time_in
             attendance.time_out = time_out
             attendance.minutes_late = minutes_late
+            attendance.undertime_hours = undertime_hours
+            attendance.undertime_minutes = undertime_minutes
             attendance.remark = remark
 
             # Update the excel_file field with the ID
@@ -809,6 +816,8 @@ def add_attendance(request, username):
             date = formData.get('date')
             time_in = formData.get('time_in')
             time_out = formData.get('time_out')
+            undertime_hours = formData.get('undertime_hours')
+            undertime_minutes = formData.get('undertime_minutes')
             minutes_late = formData.get('minutes_late')
             existing_file_id = formData.get('existing_file')
             remark = formData.get('remark')
@@ -823,6 +832,8 @@ def add_attendance(request, username):
                 generated_date=last_generated_date,
                 time_in=time_in,
                 time_out=time_out,
+                undertime_hours=undertime_hours,
+                undertime_minutes=undertime_minutes,
                 minutes_late=minutes_late,
                 excel_file=existing_file,
                 remark=remark,

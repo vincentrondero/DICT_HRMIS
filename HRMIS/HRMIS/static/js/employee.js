@@ -117,3 +117,41 @@ function closeAttendanceModal() {
 }
 
 
+function downloadPdf() {
+    // Show the PDF content section
+    $('#pdfContent').show();
+
+    // Capture the PDF content
+    const element = document.getElementById('pdfContent');
+
+    // Use html2pdf to generate the PDF
+    html2pdf(element, {
+        margin: 5,
+        filename: 'salary_receipt.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: [162, 125], orientation: 'portrait' },
+        onAfterPdf: function (pdf) {
+            $('#pdfContent').hide();
+        }
+    });
+}
+
+function downloadDTRPdf(button) {
+    $('#pdfDTR').show();
+    console.log("button");
+    // Capture the PDF content
+    const element = document.getElementById('pdfDTR'); 
+
+    // Use html2pdf to generate the PDF
+    html2pdf(element, {
+        margin: 5,
+        filename: 'salary_receipt.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: [400, 230], orientation: 'portrait' },
+        onAfterPdf: function (pdf) {
+            $('#pdfDTR').hide();
+        }
+    });
+}
